@@ -12,10 +12,18 @@
 #include <string.h>
 #include <pthread.h>
 #include <time.h>
+#include <stos.h>
 
 int kolej = 0; //0-3
 int gracze = 0;
 bool wygrana = false;
+char** talia;
+pthread_mutex_t talia_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t ruch_mutex = PTHREAD_MUTEX_INITIALIZER;
+struct karta* dobierane=NULL;
+struct karta* zagrane=NULL; 
+bool ruch_jak_zegar = true;
+int dobieranie = 1;
 
 struct thread_data_t
 {
@@ -42,7 +50,7 @@ void bubblesort(int table[], int size)
 
 void tasowanie (char** talia)
 {
-    int ilosc = sizeof(talia);
+    int ilosc = sizeof(talia)/sizeof(talia[0]);
     int T[ilosc];
     int T2[ilosc];
     srand(time(0));
@@ -52,20 +60,98 @@ void tasowanie (char** talia)
         T2[i]=T[i];
     }
     bubblesort(&T, ilosc);
+    char* temp=malloc(3*sizeof(char));
     for (int j=0;j<ilosc;j++)
     {
         for (int k=0; k<ilosc;k++)
         {
             if (T[j]==T2[k])
             {
-                char* temp=malloc(3*sizeof(char));
-                temp=talia[j];
-                talia[j]=talia[k];
-                talia[k]=temp;
+                strcpy(temp, talia[j]);
+                strcpy(talia[j], talia[k]);
+                strcpy(talia[k], temp);
+                free(temp);
                 break;
             }
         }
     }
+}
+
+void przygotowanie_talii ()
+{
+    talia = malloc(68*sizeof(char*));
+    for (int i=0; i<68;i++)
+    {
+        talia[i]=malloc(3*sizeof(char));
+    }
+    strcpy(talia[0], "y00");
+    strcpy(talia[1], "y01");
+    strcpy(talia[2], "y02");
+    strcpy(talia[3], "y03");
+    strcpy(talia[4], "y04");
+    strcpy(talia[5], "y05");
+    strcpy(talia[6], "y06");
+    strcpy(talia[7], "y07");
+    strcpy(talia[8], "y08");
+    strcpy(talia[9], "y09");
+    strcpy(talia[10], "y10");
+    strcpy(talia[11], "y10"); //->zmiana kolejnosci ruchu
+    strcpy(talia[12], "y11"); //->blokowanie
+    strcpy(talia[13], "y11");
+    strcpy(talia[14], "y12"); //->+2
+    strcpy(talia[15], "y12");
+    strcpy(talia[16], "n00");
+    strcpy(talia[17], "n01");
+    strcpy(talia[18], "n02");
+    strcpy(talia[19], "n03");
+    strcpy(talia[20], "n04");
+    strcpy(talia[21], "n05");
+    strcpy(talia[22], "n06");
+    strcpy(talia[23], "n07");
+    strcpy(talia[24], "n08");
+    strcpy(talia[25], "n09");
+    strcpy(talia[26], "n10");
+    strcpy(talia[27], "n10"); //->zmiana kolejnosci ruchu
+    strcpy(talia[28], "n11"); //->blokowanie
+    strcpy(talia[29], "n11");
+    strcpy(talia[30], "n12"); //->+2
+    strcpy(talia[31], "n12");
+    strcpy(talia[32], "c00");
+    strcpy(talia[33], "c01");
+    strcpy(talia[34], "c02");
+    strcpy(talia[35], "c03");
+    strcpy(talia[36], "c04");
+    strcpy(talia[37], "c05");
+    strcpy(talia[38], "c06");
+    strcpy(talia[39], "c07");
+    strcpy(talia[40], "c08");
+    strcpy(talia[41], "c09");
+    strcpy(talia[42], "c10");
+    strcpy(talia[43], "c10"); //->zmiana kolejnosci ruchu
+    strcpy(talia[44], "c11"); //->blokowanie
+    strcpy(talia[45], "c11");
+    strcpy(talia[46], "c12"); //->+2
+    strcpy(talia[47], "c12");
+    strcpy(talia[48], "z00");
+    strcpy(talia[49], "z01");
+    strcpy(talia[50], "z02");
+    strcpy(talia[51], "z03");
+    strcpy(talia[52], "z04");
+    strcpy(talia[53], "z05");
+    strcpy(talia[54], "z06");
+    strcpy(talia[55], "z07");
+    strcpy(talia[56], "z08");
+    strcpy(talia[57], "z09");
+    strcpy(talia[58], "z10");
+    strcpy(talia[59], "z10"); //->zmiana kolejnosci ruchu
+    strcpy(talia[60], "z11"); //->blokowanie
+    strcpy(talia[61], "z11");
+    strcpy(talia[62], "z12"); //->+2
+    strcpy(talia[63], "z12");
+    strcpy(talia[64], "b10"); //->zmiana koloru
+    strcpy(talia[65], "b10"); //->zmiana koloru
+    strcpy(talia[66], "b11"); //->+4
+    strcpy(talia[67], "b11"); //->+4
 }
 
 void *ThreadBehavior(void *t_data)
@@ -73,90 +159,59 @@ void *ThreadBehavior(void *t_data)
     pthread_detach(pthread_self());
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
     int desc = th_data->my_socket;
-    char* buf=malloc(3*sizeof(char));
-    char** talia = malloc(68*sizeof(char*));
-    for (int i=0; i<68;i++)
+    tasowanie(talia);
+    pthread_mutex_lock(&talia_mutex);
+    if (th_data->my_turn==0)
     {
-        char* talia[i]=malloc(3*sizeof(char*));
+        int indeks=28;
+        while(talia[indeks][1]!='0')
+        {
+            indeks++;
+        }
+        if (indeks!=28)
+        {
+            char* swap=malloc(3*sizeof(char));
+            strcpy(swap, talia[indeks]);
+            strcpy(talia[indeks], talia[28]);
+            strcpy(talia[28], swap);
+            free(swap);
+        }
+        zagrane=push(zagrane, talia[28]);
     }
-    talia[0]="y00";
-    talia[1]="y01";
-    talia[2]="y02";
-    talia[3]="y03";
-    talia[4]="y04";
-    talia[5]="y05";
-    talia[6]="y06";
-    talia[7]="y07";
-    talia[8]="y08";
-    talia[9]="y09";
-    talia[10]="y10";
-    talia[11]="y10"; //->zmiana kolejnosci ruchu
-    talia[12]="y11"; //->blokowanie
-    talia[13]="y11";
-    talia[14]="y12"; //->+2
-    talia[15]="y12";
-    talia[16]="n00";
-    talia[17]="n01";
-    talia[18]="n02";
-    talia[19]="n03";
-    talia[20]="n04";
-    talia[21]="n05";
-    talia[22]="n06";
-    talia[23]="n07";
-    talia[24]="n08";
-    talia[25]="n09";
-    talia[26]="n10";
-    talia[27]="n10"; //->zmiana kolejnosci ruchu
-    talia[28]="n11"; //->blokowanie
-    talia[29]="n11";
-    talia[30]="n12"; //->+2
-    talia[31]="n12";
-    talia[32]="c00";
-    talia[33]="c01";
-    talia[34]="c02";
-    talia[35]="c03";
-    talia[36]="c04";
-    talia[37]="c05";
-    talia[38]="c06";
-    talia[39]="c07";
-    talia[40]="c08";
-    talia[41]="c09";
-    talia[42]="c10";
-    talia[43]="c10"; //->zmiana kolejnosci ruchu
-    talia[44]="c11"; //->blokowanie
-    talia[45]="c11";
-    talia[46]="c12"; //->+2
-    talia[47]="c12";
-    talia[48]="z00";
-    talia[49]="z01";
-    talia[50]="z02";
-    talia[51]="z03";
-    talia[52]="z04";
-    talia[53]="z05";
-    talia[54]="z06";
-    talia[55]="z07";
-    talia[56]="z08";
-    talia[57]="z09";
-    talia[58]="z10";
-    talia[59]="z10"; //->zmiana kolejnosci ruchu
-    talia[60]="z11"; //->blokowanie
-    talia[61]="z11";
-    talia[62]="z12"; //->+2
-    talia[63]="z12";
-    talia[64]="s00"; //->zmiana koloru
-    talia[65]="s00"; //->zmiana koloru
-    talia[66]="s01"; //->+4
-    talia[67]="s01"; //->+4
-    tasowanie(&talia);
-    read(desc,buf,10);
-    //write(desc, "HI", 2);
-    //char* buf=malloc(10*sizeof(char));
-    //read(desc, buf, 10);
-    /*
-    określenie tury -> kto może zagrać kartę
-    odebranie komunikatu jaka karta ma być zagrana i sprawdzenie czy jest dobra -> jak nie to nic sie nie dzieje
+    write(desc, talia[28], 3);
+    for (int i=th_data->my_turn*7; i<(th_data->my_turn+1)*7;i++)
+    {
+        write(desc, talia[i], 3);
+    }
+    if (th_data->my_turn==3)
+    {   
+        for (int i=29;i<68;i++)
+        {
+            dobierane=push(dobierane, talia[i]);
+        }
+    }
+    pthread_mutex_unlock(&talia_mutex);
+    char* komunikat=malloc(4*sizeof(char));
+    while(!wygrana)
+    {
+        read(desc, komunikat, 4);
+        pthread_mutex_lock(&ruch_mutex);
+        char* wierzch=malloc(3*sizeof(char));
+        strcpy(wierzch, pop(zagrane));
+        if ((wierzch[1]=='0' && komunikat[2]=='0' && komunikat[1]==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (wierzch[1]=='0' && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || komunikat[1]==wierzch[0])) ) 
+        {
 
-    */
+            zagrane=push(zagrane, wierzch);
+        }
+        if ()
+        {
+
+            zagrane=push(zagrane, wierzch);
+        }
+        free(wierzch);
+        pthread_mutex_unlock(&ruch_mutex);
+    }
+    
 }
 
 void handleConnection(int connection_socket_descriptor, int turn)
@@ -206,7 +261,7 @@ int main(int argc, char* argv[])
     }
     
     int connection_socket_descriptor;
-
+    przygotowanie_talii();
     while(1)
     {
         connection_socket_descriptor = accept(server_socket_descriptor, NULL, NULL);
