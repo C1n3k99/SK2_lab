@@ -18,7 +18,7 @@
     <item row="0" column="1">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <widget class="QPushButton" name="connect">
@@ -155,7 +155,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="centerPageBlue">
          <widget class="QLabel" name="centerLabelBlue">
@@ -246,7 +246,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap>obrazki/black.jpg</pixmap>
+           <pixmap>obrazki/black_bigger.jpg</pixmap>
           </property>
          </widget>
         </widget>
@@ -264,7 +264,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="rightPageBlue">
          <widget class="QLabel" name="rightLabelBlue">
@@ -373,7 +373,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="leftPageBlue">
          <widget class="QLabel" name="leftLabelBlue">
@@ -508,7 +508,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="tablePageBlue">
          <widget class="QLabel" name="tableLabelBlue">
@@ -607,7 +607,7 @@
        <widget class="QLabel" name="player2">
         <property name="geometry">
          <rect>
-          <x>390</x>
+          <x>380</x>
           <y>0</y>
           <width>91</width>
           <height>31</height>
@@ -700,7 +700,7 @@
         </property>
         <property name="font">
          <font>
-          <family>Calibri</family>
+          <family>Cambria Math</family>
           <pointsize>20</pointsize>
          </font>
         </property>
@@ -725,7 +725,7 @@
         </property>
         <property name="font">
          <font>
-          <family>Calibri</family>
+          <family>Cambria Math</family>
           <pointsize>20</pointsize>
          </font>
         </property>
@@ -750,7 +750,7 @@
         </property>
         <property name="font">
          <font>
-          <family>Calibri</family>
+          <family>Cambria Math</family>
           <pointsize>20</pointsize>
          </font>
         </property>
@@ -775,8 +775,8 @@
         </property>
         <property name="font">
          <font>
-          <family>Calibri</family>
-          <pointsize>20</pointsize>
+          <family>Comic Sans MS</family>
+          <pointsize>32</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -799,8 +799,8 @@
         </property>
         <property name="font">
          <font>
-          <family>Calibri</family>
-          <pointsize>28</pointsize>
+          <family>Comic Sans MS</family>
+          <pointsize>40</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -823,8 +823,8 @@
         </property>
         <property name="font">
          <font>
-          <family>Calibri</family>
-          <pointsize>20</pointsize>
+          <family>Comic Sans MS</family>
+          <pointsize>32</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
@@ -847,9 +847,10 @@
         </property>
         <property name="font">
          <font>
-          <family>Calibri</family>
-          <pointsize>20</pointsize>
+          <family>Comic Sans MS</family>
+          <pointsize>32</pointsize>
           <weight>75</weight>
+          <italic>false</italic>
           <bold>true</bold>
          </font>
         </property>
@@ -943,6 +944,56 @@
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_4">
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>-10</x>
+          <y>140</y>
+          <width>871</width>
+          <height>261</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QLabel" name="gameOver">
+           <property name="font">
+            <font>
+             <family>Calibri</family>
+             <pointsize>36</pointsize>
+             <weight>50</weight>
+             <italic>true</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>KONIEC GRY</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="winner">
+           <property name="font">
+            <font>
+             <family>Calibri</family>
+             <pointsize>28</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Wygrałeś!</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
