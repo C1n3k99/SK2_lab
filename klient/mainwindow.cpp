@@ -8,7 +8,55 @@ MainWindow::MainWindow(QWidget *parent):
       tcpSocket(new QTcpSocket(this))
 {
     ui->setupUi(this);
-    //ui->leftCardValue->setStyleSheet("QLabel {  color : white; }");
+
+    ui->leftLabelBlue->setPixmap(QPixmap("../klient/obrazki/blue.jpg"));
+    ui->leftLabelYellow->setPixmap(QPixmap("../klient/obrazki/yellow.png"));
+    ui->leftLabelGreen->setPixmap(QPixmap("../klient/obrazki/green.jpg"));
+    ui->leftLabelRed->setPixmap(QPixmap("../klient/obrazki/red.jpg"));
+    ui->leftLabelBlack->setPixmap(QPixmap("../klient/obrazki/black.jpg"));
+
+    ui->centerLabelBlue->setPixmap(QPixmap("../klient/obrazki/blue.jpg"));
+    ui->centerLabelYellow->setPixmap(QPixmap("../klient/obrazki/yellow.png"));
+    ui->centerLabelGreen->setPixmap(QPixmap("../klient/obrazki/green.jpg"));
+    ui->centerLabelRed->setPixmap(QPixmap("../klient/obrazki/red.jpg"));
+    ui->centerLabelBlack->setPixmap(QPixmap("../klient/obrazki/black_bigger.jpg"));
+
+    ui->rightLabelBlue->setPixmap(QPixmap("../klient/obrazki/blue.jpg"));
+    ui->rightLabelYellow->setPixmap(QPixmap("../klient/obrazki/yellow.png"));
+    ui->rightLabelGreen->setPixmap(QPixmap("../klient/obrazki/green.jpg"));
+    ui->rightLabelRed->setPixmap(QPixmap("../klient/obrazki/red.jpg"));
+    ui->rightLabelBlack->setPixmap(QPixmap("../klient/obrazki/black.jpg"));
+
+    ui->tableLabelBlue->setPixmap(QPixmap("../klient/obrazki/blue.jpg"));
+    ui->tableLabelYellow->setPixmap(QPixmap("../klient/obrazki/yellow.png"));
+    ui->tableLabelGreen->setPixmap(QPixmap("../klient/obrazki/green.jpg"));
+    ui->tableLabelRed->setPixmap(QPixmap("../klient/obrazki/red.jpg"));
+    ui->tableLabelBlack->setPixmap(QPixmap("../klient/obrazki/black.jpg"));
+
+    ui->leftCardValue->setStyleSheet("QLabel {  color : black; }");
+    ui->centerCardValue->setStyleSheet("QLabel { color : black; }");
+    ui->rightCardValue->setStyleSheet("QLabel { color : black; }");
+    ui->tableCardValue->setStyleSheet("QLabel { color : black; }");
+/*
+    ui->leftLabelBlue->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->leftLabelYellow->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->leftLabelGreen->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->leftLabelRed->setStyleSheet("QLabel { border : 3px solid black; }");
+
+    ui->centerLabelBlue->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->centerLabelYellow->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->centerLabelGreen->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->centerLabelRed->setStyleSheet("QLabel { border : 3px solid black; }");
+
+    ui->rightLabelBlue->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->rightLabelYellow->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->rightLabelGreen->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->rightLabelRed->setStyleSheet("QLabel { border : 3px solid black; }");
+
+    ui->tableLabelBlue->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->tableLabelYellow->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->tableLabelGreen->setStyleSheet("QLabel { border : 3px solid black; }");
+    ui->tableLabelRed->setStyleSheet("QLabel { border : 3px solid black; }");*/
 }
 
 MainWindow::~MainWindow()

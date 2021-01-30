@@ -17,17 +17,23 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="1">
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <widget class="QPushButton" name="connect">
         <property name="geometry">
          <rect>
-          <x>260</x>
+          <x>310</x>
           <y>290</y>
-          <width>281</width>
-          <height>101</height>
+          <width>261</width>
+          <height>91</height>
          </rect>
         </property>
         <property name="font">
@@ -40,12 +46,12 @@
          <string>Połącz</string>
         </property>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="layoutWidget1">
         <property name="geometry">
          <rect>
-          <x>200</x>
+          <x>240</x>
           <y>210</y>
-          <width>421</width>
+          <width>361</width>
           <height>51</height>
          </rect>
         </property>
@@ -83,16 +89,16 @@
        <widget class="QLabel" name="waitingForPlayers">
         <property name="geometry">
          <rect>
-          <x>280</x>
+          <x>-10</x>
           <y>220</y>
-          <width>281</width>
+          <width>881</width>
           <height>81</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Calibri</family>
-          <pointsize>14</pointsize>
+          <pointsize>16</pointsize>
          </font>
         </property>
         <property name="text">
@@ -106,7 +112,7 @@
         <property name="geometry">
          <rect>
           <x>350</x>
-          <y>400</y>
+          <y>370</y>
           <width>131</width>
           <height>51</height>
          </rect>
@@ -127,7 +133,7 @@
         <property name="geometry">
          <rect>
           <x>710</x>
-          <y>400</y>
+          <y>380</y>
           <width>93</width>
           <height>28</height>
          </rect>
@@ -135,17 +141,25 @@
         <property name="font">
          <font>
           <family>Calibri</family>
-          <pointsize>9</pointsize>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="text">
          <string>UNO</string>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
        </widget>
        <widget class="QStackedWidget" name="centerCard">
         <property name="geometry">
          <rect>
-          <x>370</x>
+          <x>400</x>
           <y>340</y>
           <width>121</width>
           <height>191</height>
@@ -155,7 +169,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="centerPageBlue">
          <widget class="QLabel" name="centerLabelBlue">
@@ -168,7 +182,10 @@
            </rect>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -188,6 +205,12 @@
             <height>181</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -205,6 +228,12 @@
             <width>111</width>
             <height>181</height>
            </rect>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -224,6 +253,12 @@
             <height>181</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -242,6 +277,12 @@
             <height>181</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>2</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -254,7 +295,7 @@
        <widget class="QStackedWidget" name="rightCard">
         <property name="geometry">
          <rect>
-          <x>510</x>
+          <x>540</x>
           <y>380</y>
           <width>101</width>
           <height>151</height>
@@ -264,7 +305,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="rightPageBlue">
          <widget class="QLabel" name="rightLabelBlue">
@@ -277,7 +318,10 @@
            </rect>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -297,6 +341,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -314,6 +364,12 @@
             <width>91</width>
             <height>141</height>
            </rect>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -333,6 +389,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -351,6 +413,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>2</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -363,7 +431,7 @@
        <widget class="QStackedWidget" name="leftCard">
         <property name="geometry">
          <rect>
-          <x>250</x>
+          <x>280</x>
           <y>380</y>
           <width>101</width>
           <height>151</height>
@@ -386,7 +454,10 @@
            </rect>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -406,6 +477,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -423,6 +500,12 @@
             <width>91</width>
             <height>141</height>
            </rect>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -442,6 +525,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -460,6 +549,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>2</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -472,11 +567,24 @@
        <widget class="QPushButton" name="nextCard">
         <property name="geometry">
          <rect>
-          <x>620</x>
+          <x>660</x>
           <y>480</y>
           <width>61</width>
           <height>41</height>
          </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
         </property>
         <property name="text">
          <string>-&gt;</string>
@@ -487,9 +595,29 @@
          <rect>
           <x>170</x>
           <y>480</y>
-          <width>61</width>
-          <height>41</height>
+          <width>60</width>
+          <height>40</height>
          </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>13</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
         </property>
         <property name="text">
          <string>&lt;-</string>
@@ -498,7 +626,7 @@
        <widget class="QStackedWidget" name="tableCard">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>410</x>
           <y>120</y>
           <width>101</width>
           <height>151</height>
@@ -508,7 +636,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tablePageBlue">
          <widget class="QLabel" name="tableLabelBlue">
@@ -521,7 +649,10 @@
            </rect>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -541,6 +672,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -558,6 +695,12 @@
             <width>91</width>
             <height>141</height>
            </rect>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
           </property>
           <property name="text">
            <string/>
@@ -577,6 +720,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>3</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -595,6 +744,12 @@
             <height>141</height>
            </rect>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="lineWidth">
+           <number>2</number>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -607,7 +762,7 @@
        <widget class="QLabel" name="player2">
         <property name="geometry">
          <rect>
-          <x>380</x>
+          <x>420</x>
           <y>0</y>
           <width>91</width>
           <height>31</height>
@@ -616,7 +771,7 @@
         <property name="font">
          <font>
           <family>Calibri</family>
-          <pointsize>12</pointsize>
+          <pointsize>14</pointsize>
          </font>
         </property>
         <property name="text">
@@ -629,7 +784,7 @@
        <widget class="QLabel" name="player1">
         <property name="geometry">
          <rect>
-          <x>750</x>
+          <x>720</x>
           <y>160</y>
           <width>81</width>
           <height>31</height>
@@ -638,7 +793,7 @@
         <property name="font">
          <font>
           <family>Calibri</family>
-          <pointsize>12</pointsize>
+          <pointsize>14</pointsize>
          </font>
         </property>
         <property name="text">
@@ -651,7 +806,7 @@
        <widget class="QLabel" name="player3">
         <property name="geometry">
          <rect>
-          <x>20</x>
+          <x>110</x>
           <y>160</y>
           <width>91</width>
           <height>31</height>
@@ -660,7 +815,9 @@
         <property name="font">
          <font>
           <family>Calibri</family>
-          <pointsize>12</pointsize>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">
@@ -676,13 +833,15 @@
           <x>40</x>
           <y>470</y>
           <width>93</width>
-          <height>28</height>
+          <height>31</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Calibri</family>
-          <pointsize>9</pointsize>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="text">
@@ -692,7 +851,7 @@
        <widget class="QLabel" name="numberOfCardsPlayer1">
         <property name="geometry">
          <rect>
-          <x>770</x>
+          <x>740</x>
           <y>200</y>
           <width>41</width>
           <height>61</height>
@@ -707,6 +866,9 @@
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
         <property name="text">
          <string>5</string>
         </property>
@@ -717,7 +879,7 @@
        <widget class="QLabel" name="numberOfCardsPlayer2">
         <property name="geometry">
          <rect>
-          <x>410</x>
+          <x>440</x>
           <y>40</y>
           <width>41</width>
           <height>61</height>
@@ -732,6 +894,9 @@
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
         <property name="text">
          <string>5</string>
         </property>
@@ -742,7 +907,7 @@
        <widget class="QLabel" name="numberOfCardsPlayer3">
         <property name="geometry">
          <rect>
-          <x>40</x>
+          <x>130</x>
           <y>200</y>
           <width>41</width>
           <height>61</height>
@@ -757,6 +922,9 @@
         <property name="frameShape">
          <enum>QFrame::Box</enum>
         </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
         <property name="text">
          <string>5</string>
         </property>
@@ -767,7 +935,7 @@
        <widget class="QLabel" name="leftCardValue">
         <property name="geometry">
          <rect>
-          <x>270</x>
+          <x>300</x>
           <y>420</y>
           <width>61</width>
           <height>71</height>
@@ -791,7 +959,7 @@
        <widget class="QLabel" name="centerCardValue">
         <property name="geometry">
          <rect>
-          <x>400</x>
+          <x>430</x>
           <y>400</y>
           <width>61</width>
           <height>71</height>
@@ -815,7 +983,7 @@
        <widget class="QLabel" name="rightCardValue">
         <property name="geometry">
          <rect>
-          <x>530</x>
+          <x>560</x>
           <y>420</y>
           <width>61</width>
           <height>71</height>
@@ -839,7 +1007,7 @@
        <widget class="QLabel" name="tableCardValue">
         <property name="geometry">
          <rect>
-          <x>400</x>
+          <x>430</x>
           <y>160</y>
           <width>61</width>
           <height>71</height>
@@ -861,13 +1029,13 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="layoutWidget2">
         <property name="geometry">
          <rect>
           <x>30</x>
           <y>380</y>
           <width>120</width>
-          <height>61</height>
+          <height>51</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -891,8 +1059,10 @@
           <widget class="QLabel" name="numberOfMyCards">
            <property name="font">
             <font>
-             <family>Calibri</family>
+             <family>Cambria Math</family>
              <pointsize>14</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
             </font>
            </property>
            <property name="text">
@@ -905,13 +1075,13 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="layoutWidget3">
         <property name="geometry">
          <rect>
-          <x>340</x>
+          <x>370</x>
           <y>280</y>
-          <width>181</width>
-          <height>23</height>
+          <width>201</width>
+          <height>26</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -920,7 +1090,7 @@
            <property name="font">
             <font>
              <family>Calibri</family>
-             <pointsize>10</pointsize>
+             <pointsize>12</pointsize>
             </font>
            </property>
            <property name="text">
@@ -936,7 +1106,7 @@
            <property name="font">
             <font>
              <family>Calibri</family>
-             <pointsize>10</pointsize>
+             <pointsize>12</pointsize>
             </font>
            </property>
            <property name="text">
@@ -949,9 +1119,30 @@
          </item>
         </layout>
        </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>700</x>
+          <y>420</y>
+          <width>111</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>RZUĆ KARTĘ</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_4">
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="layoutWidget4">
         <property name="geometry">
          <rect>
           <x>-10</x>
