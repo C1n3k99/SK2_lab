@@ -37,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent):
     ui->centerCardValue->setStyleSheet("QLabel { color : black; }");
     ui->rightCardValue->setStyleSheet("QLabel { color : black; }");
     ui->tableCardValue->setStyleSheet("QLabel { color : black; }");
+
+
+
 /*
     ui->leftLabelBlue->setStyleSheet("QLabel { border : 3px solid black; }");
     ui->leftLabelYellow->setStyleSheet("QLabel { border : 3px solid black; }");
