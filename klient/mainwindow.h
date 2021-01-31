@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QtNetwork>
+#include <vector>
+
+using namespace std;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,14 +18,33 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void read_data();
+    void connection_error_occured();
+    void state_changed();
+    void update_table_card(char card[3]);
 
 private slots:
-    void on_connect_clicked();
 
-    void on_exitGame_clicked();
+    void on_connectButton_clicked();
+
+    void on_backButton_clicked();
+
+    void on_newGameButton_clicked();
+
+    void on_blueButton_clicked();
+
+    void on_yellowButton_clicked();
+
+    void on_greenButton_clicked();
+
+    void on_redButton_clicked();
 
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;
+    vector<string> myDeck;
+    char tableCard[3];
+    int middle;
+    bool start = true;
 };
 #endif // MAINWINDOW_H

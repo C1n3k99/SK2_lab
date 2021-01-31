@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
+    <item row="0" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="startingPage">
        <widget class="QPushButton" name="connectButton">
@@ -50,7 +50,7 @@
         <property name="geometry">
          <rect>
           <x>240</x>
-          <y>210</y>
+          <y>140</y>
           <width>361</width>
           <height>51</height>
          </rect>
@@ -84,9 +84,47 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="layoutWidget2">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>210</y>
+          <width>361</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,2">
+         <item>
+          <widget class="QLabel" name="giveYourServerAddress">
+           <property name="font">
+            <font>
+             <family>Calibri</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Podaj adres serwera:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="yourServerAddress">
+           <property name="font">
+            <font>
+             <family>Calibri</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="waitingPage">
-       <widget class="QLabel" name="waitingForPlayers">
+       <widget class="QLabel" name="waitingLabel">
         <property name="geometry">
          <rect>
           <x>-10</x>
@@ -108,7 +146,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QPushButton" name="exitGameButton">
+       <widget class="QPushButton" name="backButton">
         <property name="geometry">
          <rect>
           <x>350</x>
@@ -124,7 +162,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Wyjdź z gry</string>
+         <string>Powrót</string>
         </property>
        </widget>
       </widget>
@@ -156,7 +194,7 @@
          </size>
         </property>
        </widget>
-       <widget class="QStackedWidget" name="centerCard">
+       <widget class="QStackedWidget" name="middleCard">
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -169,10 +207,10 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>4</number>
         </property>
-        <widget class="QWidget" name="centerPageBlue">
-         <widget class="QLabel" name="centerLabelBlue">
+        <widget class="QWidget" name="middlePageBlue">
+         <widget class="QLabel" name="middleLabelBlue">
           <property name="geometry">
            <rect>
             <x>4</x>
@@ -195,8 +233,8 @@
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="centerPageYellow">
-         <widget class="QLabel" name="centerLabelYellow">
+        <widget class="QWidget" name="middlePageYellow">
+         <widget class="QLabel" name="middleLabelYellow">
           <property name="geometry">
            <rect>
             <x>4</x>
@@ -219,8 +257,8 @@
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="centerPageGreen">
-         <widget class="QLabel" name="centerLabelGreen">
+        <widget class="QWidget" name="middlePageGreen">
+         <widget class="QLabel" name="middleLabelGreen">
           <property name="geometry">
            <rect>
             <x>4</x>
@@ -243,8 +281,8 @@
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="centerPageRed">
-         <widget class="QLabel" name="centerLabelRed">
+        <widget class="QWidget" name="middlePageRed">
+         <widget class="QLabel" name="middleLabelRed">
           <property name="geometry">
            <rect>
             <x>4</x>
@@ -267,8 +305,8 @@
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="centerPageBlack">
-         <widget class="QLabel" name="centerLabelBlack">
+        <widget class="QWidget" name="middlePageBlack">
+         <widget class="QLabel" name="middleLabelBlack">
           <property name="geometry">
            <rect>
             <x>4</x>
@@ -441,7 +479,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="leftPageBlue">
          <widget class="QLabel" name="leftLabelBlue">
@@ -870,7 +908,7 @@
          <number>2</number>
         </property>
         <property name="text">
-         <string>5</string>
+         <string>7</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -898,7 +936,7 @@
          <number>2</number>
         </property>
         <property name="text">
-         <string>5</string>
+         <string>7</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -926,7 +964,7 @@
          <number>2</number>
         </property>
         <property name="text">
-         <string>5</string>
+         <string>7</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -950,7 +988,7 @@
          </font>
         </property>
         <property name="text">
-         <string>2</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -959,9 +997,9 @@
        <widget class="QLabel" name="centerCardValue">
         <property name="geometry">
          <rect>
-          <x>430</x>
+          <x>420</x>
           <y>400</y>
-          <width>61</width>
+          <width>81</width>
           <height>71</height>
          </rect>
         </property>
@@ -974,7 +1012,7 @@
          </font>
         </property>
         <property name="text">
-         <string>2</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -998,7 +1036,7 @@
          </font>
         </property>
         <property name="text">
-         <string>2</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -1023,57 +1061,11 @@
          </font>
         </property>
         <property name="text">
-         <string>2</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
-       </widget>
-       <widget class="QWidget" name="layoutWidget2">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>380</y>
-          <width>120</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLabel" name="myLeftCards">
-           <property name="font">
-            <font>
-             <family>Calibri</family>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Pozostało kart:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="numberOfMyCards">
-           <property name="font">
-            <font>
-             <family>Cambria Math</family>
-             <pointsize>14</pointsize>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>5</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </widget>
        <widget class="QWidget" name="layoutWidget3">
         <property name="geometry">
@@ -1143,24 +1135,90 @@
        <widget class="QLabel" name="demandingColor">
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>60</x>
           <y>40</y>
           <width>191</width>
-          <height>41</height>
+          <height>71</height>
          </rect>
         </property>
         <property name="font">
          <font>
           <family>Calibri</family>
           <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="text">
-         <string>Żądany kolor</string>
+         <string/>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>32</x>
+          <y>370</y>
+          <width>121</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <item>
+          <widget class="QLabel" name="leftCards">
+           <property name="font">
+            <font>
+             <family>Calibri</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Pozostało kart:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="numberOfMyCards">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>129</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Cambria Math</family>
+             <pointsize>14</pointsize>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>7</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="chooseCardPage">
@@ -1257,7 +1315,7 @@
         <property name="geometry">
          <rect>
           <x>-10</x>
-          <y>140</y>
+          <y>110</y>
           <width>871</width>
           <height>261</height>
          </rect>
@@ -1300,6 +1358,25 @@
           </widget>
          </item>
         </layout>
+       </widget>
+       <widget class="QPushButton" name="newGameButton">
+        <property name="geometry">
+         <rect>
+          <x>350</x>
+          <y>430</y>
+          <width>151</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Nowa gra</string>
+        </property>
        </widget>
       </widget>
      </widget>
