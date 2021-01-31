@@ -20,10 +20,13 @@ bool wygrana = false;
 char** talia;
 pthread_mutex_t talia_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t ruch_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t desc_mutex = PTHREAD_MUTEX_INITIALIZER;
 struct karta* dobierane=NULL;
 struct karta* zagrane=NULL; 
 bool ruch_jak_zegar = true;
 int dobieranie = 1;
+bool zagrana = false;
+int tab_desc[4];
 
 struct thread_data_t
 {
@@ -74,6 +77,14 @@ void tasowanie (char** talia)
                 break;
             }
         }
+    }
+}
+
+void wysylanie_komunikatu(char* komunikat)
+{
+    for (int i=0; i<4; i++)
+    {
+        write(tab_desc[i], komunikat, 4);
     }
 }
 
@@ -148,10 +159,89 @@ void przygotowanie_talii ()
     strcpy(talia[61], "z11");
     strcpy(talia[62], "z12"); //->+2
     strcpy(talia[63], "z12");
-    strcpy(talia[64], "b10"); //->zmiana koloru
-    strcpy(talia[65], "b10"); //->zmiana koloru
-    strcpy(talia[66], "b11"); //->+4
-    strcpy(talia[67], "b11"); //->+4
+    strcpy(talia[64], "b13"); //->zmiana koloru
+    strcpy(talia[65], "b13"); //->zmiana koloru
+    strcpy(talia[66], "b14"); //->+4
+    strcpy(talia[67], "b14"); //->+4
+}
+
+bool sprawdzenie_komunikatu (char* komunikat)
+{
+    char* wierzch=malloc(3*sizeof(char));
+    strcpy(wierzch, pop(zagrane));
+    char* zagrana_karta=malloc(3*sizeof(char));
+    strcpy(zagrana_karta, komunikat[1]+komunikat[2]+komunikat[3]);
+    zagrana = false;
+    //zagranie zwykłej
+    if ((dobieranie==1 && komunikat[2]=='0' && komunikat[1]==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || komunikat[1]==wierzch[0])) ) 
+    {
+        zagrane=push(zagrane, wierzch);
+        zagrane=push(zagrane, zagrana_karta);
+        wysylanie_komunikatu();
+        zagrana = true;
+    }
+    //zagranie zmiany kolejności tury
+    else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0])) 
+    {
+        zagrane=push(zagrane, wierzch);
+        zagrane=push(zagrane, zagrana_karta);
+        wysylanie_komunikatu();
+        zagrana = true;
+    }
+    //zagranie stopu
+    else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0]))
+    {
+        zagrane=push(zagrane, wierzch);
+        zagrane=push(zagrane, zagrana_karta);
+        wysylanie_komunikatu();
+        zagrana = true;
+    }
+    //zagranie +2
+    else if (komunikat[2]=='1' && komunikat[3]=='2' && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (komunikat[1]==wierzch[0] && dobieranie==1)))
+    {
+        zagrane=push(zagrane, wierzch);
+        zagrane=push(zagrane, zagrana_karta);
+        if (dobieranie==1)
+        {
+            dobieranie+=1;
+        }
+        else dobieranie+=2;
+        zagrana = true;
+    }
+    //zagranie +4
+    else if (komunikat[2]=='1' && komunikat[3]=='4' && atoi(komunikat[0])==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
+    {
+        zagrane=push(zagrane, wierzch);
+        zagrane=push(zagrane, zagrana_karta);
+        if (dobieranie==1)
+        {
+            dobieranie+=3;
+        }
+        else dobieranie+=4;
+        zagrana = true;
+    }
+    //zagranie zmiany koloru
+    else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && atoi(komunikat[0])==kolej)
+    {
+        zagrane=push(zagrane, wierzch);
+        zagrana = true;
+    }
+    //komunikat o dobraniu kart
+    else if (atoi(komunikat[0])==kolej)
+    {
+        zagrane=push(zagrane, wierzch);
+        zagrana = true;
+        wysylanie_komunikatu();
+        dobieranie=1;
+    }
+    if (zagrana) {
+        if (ruch_jak_zegar) kolej+=1;
+        else kolej -=1;}
+    free(wierzch);
+    //tu wysłać komunikat kogo kolej
+    wysylanie_komunikatu();
+    //trzeba jakoś sprawdzić czy jest wygrana
+    //trzeba ogarnac jaki komunikat gdy lezy czarna karta
 }
 
 void *ThreadBehavior(void *t_data)
@@ -196,19 +286,13 @@ void *ThreadBehavior(void *t_data)
     {
         read(desc, komunikat, 4);
         pthread_mutex_lock(&ruch_mutex);
-        char* wierzch=malloc(3*sizeof(char));
-        strcpy(wierzch, pop(zagrane));
-        if ((wierzch[1]=='0' && komunikat[2]=='0' && komunikat[1]==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (wierzch[1]=='0' && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || komunikat[1]==wierzch[0])) ) 
+        if (!wygrana)
         {
+            if (sprawdzenie_komunikatu(komunikat))
+            {
 
-            zagrane=push(zagrane, wierzch);
+            }
         }
-        if ()
-        {
-
-            zagrane=push(zagrane, wierzch);
-        }
-        free(wierzch);
         pthread_mutex_unlock(&ruch_mutex);
     }
     
@@ -270,6 +354,9 @@ int main(int argc, char* argv[])
             fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda dla połączenia.\n", argv[0]);
             exit(1);
         }
+        pthread_mutex_lock(&desc_mutex);
+        tab_desc[gracze]=connection_socket_descriptor;
+        pthread_mutex_unlock(&desc_mutex);
         handleConnection(connection_socket_descriptor, gracze);
         gracze++;
     }
