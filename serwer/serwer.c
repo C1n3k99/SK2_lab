@@ -27,6 +27,7 @@ bool ruch_jak_zegar = true;
 int dobieranie = 1;
 bool zagrana = false;
 int tab_desc[4];
+int ile_na_rece = {7, 7, 7, 7};
 
 struct thread_data_t
 {
@@ -183,6 +184,8 @@ bool sprawdzenie_komunikatu (char* komunikat)
     //zagranie zmiany kolejności tury
     else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0])) 
     {
+        if (ruch_jak_zegar) ruch_jak_zegar=false;
+        else ruch_jak_zegar=true;
         zagrane=push(zagrane, wierzch);
         zagrane=push(zagrane, zagrana_karta);
         wysylanie_komunikatu();
@@ -238,8 +241,6 @@ bool sprawdzenie_komunikatu (char* komunikat)
         if (ruch_jak_zegar) kolej+=1;
         else kolej -=1;}
     free(wierzch);
-    //tu wysłać komunikat kogo kolej
-    wysylanie_komunikatu();
     //trzeba jakoś sprawdzić czy jest wygrana
     //trzeba ogarnac jaki komunikat gdy lezy czarna karta
 }
@@ -249,7 +250,6 @@ void *ThreadBehavior(void *t_data)
     pthread_detach(pthread_self());
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
     int desc = th_data->my_socket;
-    tasowanie(talia);
     pthread_mutex_lock(&talia_mutex);
     if (th_data->my_turn==0)
     {
@@ -280,6 +280,7 @@ void *ThreadBehavior(void *t_data)
             dobierane=push(dobierane, talia[i]);
         }
     }
+    write(desc, nick[0], 20);
     pthread_mutex_unlock(&talia_mutex);
     char* komunikat=malloc(4*sizeof(char));
     while(!wygrana)
@@ -346,6 +347,7 @@ int main(int argc, char* argv[])
     
     int connection_socket_descriptor;
     przygotowanie_talii();
+    tasowanie(talia);
     while(1)
     {
         connection_socket_descriptor = accept(server_socket_descriptor, NULL, NULL);
