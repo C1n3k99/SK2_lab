@@ -22,6 +22,7 @@ public:
     void connection_error_occured();
     void state_changed();
     void update_table_card(char card[3]);
+    void update_cards_in_hand(int l, int m, int r);
 
 private slots:
 
@@ -44,7 +45,7 @@ private:
     QTcpSocket *tcpSocket;
     vector<string> myDeck;
     char tableCard[3];
-    int middle;
+    int left, middle, right;
     bool start = true;
 };
 #endif // MAINWINDOW_H

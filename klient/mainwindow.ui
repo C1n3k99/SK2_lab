@@ -479,7 +479,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="leftPageBlue">
          <widget class="QLabel" name="leftLabelBlue">
@@ -994,7 +994,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="centerCardValue">
+       <widget class="QLabel" name="middleCardValue">
         <property name="geometry">
          <rect>
           <x>420</x>

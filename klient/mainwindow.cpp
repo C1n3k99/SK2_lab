@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui->tableLabelBlack->setPixmap(QPixmap("../klient/obrazki/black.jpg"));
 
     ui->leftCardValue->setStyleSheet("QLabel {  color : black; }");
-    ui->centerCardValue->setStyleSheet("QLabel { color : black; }");
+    ui->middleCardValue->setStyleSheet("QLabel { color : black; }");
     ui->rightCardValue->setStyleSheet("QLabel { color : black; }");
     ui->tableCardValue->setStyleSheet("QLabel { color : black; }");
 }
@@ -61,7 +61,9 @@ void MainWindow::read_data()
             myDeck.push_back(myCards);
         }
         update_table_card(tableCard);
+        left = 0;
         middle = 1;
+        right = 2;
 
         //odbieranie mojego numerka
         //odbieranie nicków
@@ -212,16 +214,276 @@ void MainWindow::update_table_card(char card[3])
     }
 }
 
-/*void update_cards_in_hand(int left, int middle, int right)
+//ZMIENIĆ NAZWĘ
+//podaje już ustawione indeksy
+void MainWindow::update_cards_in_hand(int l, int m, int r)
 {
-    char card[3];
+    char color, specialCard, value;
+
     for(int i = 0; i < 3; i++)
     {
-        if(i == 0)
-            card = myDeck(left);
-        if(i == 1)
-            card = myDeck(middle);
-        if(i == 2)
-            card = myDeck(right);
+        if(i == 0)  //lewa karta
+        {
+            color = myDeck[l][0];
+            specialCard = myDeck[l][1];
+            value = myDeck[l][2];
+
+            switch (color){
+            case 'n':
+                ui->leftCard->setCurrentWidget(ui->leftPageBlue);
+                break;
+            case 'y':
+                ui->leftCard->setCurrentWidget(ui->leftPageYellow);
+                break;
+            case 'z':
+                ui->leftCard->setCurrentWidget(ui->leftPageGreen);
+                break;
+            case 'c':
+                ui->leftCard->setCurrentWidget(ui->leftPageRed);
+                break;
+            case 'b':
+                ui->leftCard->setCurrentWidget(ui->leftPageBlack);
+                break;
+            }
+
+            if(specialCard == '0')
+            {
+                switch (value){
+                case '0':
+                    ui->leftCardValue->setText("0");
+                    break;
+                case '1':
+                    ui->leftCardValue->setText("1");
+                    break;
+                case '2':
+                    ui->leftCardValue->setText("2");
+                    break;
+                case '3':
+                    ui->leftCardValue->setText("3");
+                    break;
+                case '4':
+                    ui->leftCardValue->setText("4");
+                    break;
+                case '5':
+                    ui->leftCardValue->setText("5");
+                    break;
+                case '6':
+                    ui->leftCardValue->setText("6");
+                    break;
+                case '7':
+                    ui->leftCardValue->setText("7");
+                    break;
+                case '8':
+                    ui->leftCardValue->setText("8");
+                    break;
+                case '9':
+                    ui->leftCardValue->setText("9");
+                    break;
+                }
+            }
+            else{
+                switch (value){
+                case '0':
+                    ui->leftCardValue->setText("<>");
+                    break;
+                case '1':
+                    ui->leftCardValue->setText("Ø");
+                    break;
+                case '2':
+                    ui->leftCardValue->setText("+2");
+                    break;
+                case '3':
+                    ui->leftCardValue->setText("");
+                    ui->stackedWidget->setCurrentWidget(ui->chooseCardPage);
+                    break;
+                case '4':
+                    ui->leftCardValue->setText("+4");
+                }
+            }
+        }
+        else if(i == 1) //środkowa karta
+        {
+            color = myDeck[m][0];
+            specialCard = myDeck[m][1];
+            value = myDeck[m][2];
+
+            switch (color){
+            case 'n':
+                ui->middleCard->setCurrentWidget(ui->middlePageBlue);
+                break;
+            case 'y':
+                ui->middleCard->setCurrentWidget(ui->middlePageYellow);
+                break;
+            case 'z':
+                ui->middleCard->setCurrentWidget(ui->middlePageGreen);
+                break;
+            case 'c':
+                ui->middleCard->setCurrentWidget(ui->middlePageRed);
+                break;
+            case 'b':
+                ui->middleCard->setCurrentWidget(ui->middlePageBlack);
+                break;
+            }
+
+            if(specialCard == '0')
+            {
+                switch (value){
+                case '0':
+                    ui->middleCardValue->setText("0");
+                    break;
+                case '1':
+                    ui->middleCardValue->setText("1");
+                    break;
+                case '2':
+                    ui->middleCardValue->setText("2");
+                    break;
+                case '3':
+                    ui->middleCardValue->setText("3");
+                    break;
+                case '4':
+                    ui->middleCardValue->setText("4");
+                    break;
+                case '5':
+                    ui->middleCardValue->setText("5");
+                    break;
+                case '6':
+                    ui->middleCardValue->setText("6");
+                    break;
+                case '7':
+                    ui->middleCardValue->setText("7");
+                    break;
+                case '8':
+                    ui->middleCardValue->setText("8");
+                    break;
+                case '9':
+                    ui->middleCardValue->setText("9");
+                    break;
+                }
+            }
+            else{
+                switch (value){
+                case '0':
+                    ui->middleCardValue->setText("<>");
+                    break;
+                case '1':
+                    ui->middleCardValue->setText("Ø");
+                    break;
+                case '2':
+                    ui->middleCardValue->setText("+2");
+                    break;
+                case '3':
+                    ui->middleCardValue->setText("");
+                    ui->stackedWidget->setCurrentWidget(ui->chooseCardPage);
+                    break;
+                case '4':
+                    ui->middleCardValue->setText("+4");
+                }
+            }
+        }
+        else{   //prawa karta
+            color = myDeck[r][0];
+            specialCard = myDeck[r][1];
+            value = myDeck[r][2];
+
+            switch (color){
+            case 'n':
+                ui->rightCard->setCurrentWidget(ui->rightPageBlue);
+                break;
+            case 'y':
+                ui->rightCard->setCurrentWidget(ui->rightPageYellow);
+                break;
+            case 'z':
+                ui->rightCard->setCurrentWidget(ui->rightPageGreen);
+                break;
+            case 'c':
+                ui->rightCard->setCurrentWidget(ui->rightPageRed);
+                break;
+            case 'b':
+                ui->rightCard->setCurrentWidget(ui->rightPageBlack);
+                break;
+            }
+
+            if(specialCard == '0')
+            {
+                switch (value){
+                case '0':
+                    ui->rightCardValue->setText("0");
+                    break;
+                case '1':
+                    ui->rightCardValue->setText("1");
+                    break;
+                case '2':
+                    ui->rightCardValue->setText("2");
+                    break;
+                case '3':
+                    ui->rightCardValue->setText("3");
+                    break;
+                case '4':
+                    ui->rightCardValue->setText("4");
+                    break;
+                case '5':
+                    ui->rightCardValue->setText("5");
+                    break;
+                case '6':
+                    ui->rightCardValue->setText("6");
+                    break;
+                case '7':
+                    ui->rightCardValue->setText("7");
+                    break;
+                case '8':
+                    ui->rightCardValue->setText("8");
+                    break;
+                case '9':
+                    ui->rightCardValue->setText("9");
+                    break;
+                }
+            }
+            else{
+                switch (value){
+                case '0':
+                    ui->rightCardValue->setText("<>");
+                    break;
+                case '1':
+                    ui->rightCardValue->setText("Ø");
+                    break;
+                case '2':
+                    ui->rightCardValue->setText("+2");
+                    break;
+                case '3':
+                    ui->rightCardValue->setText("");
+                    ui->stackedWidget->setCurrentWidget(ui->chooseCardPage);
+                    break;
+                case '4':
+                    ui->rightCardValue->setText("+4");
+                }
+            }
+        }
     }
-}*/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
