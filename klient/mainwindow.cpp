@@ -179,16 +179,25 @@ void MainWindow::on_throwCard_clicked()
 
     myDeck.erase(myDeck.begin() + middle - 1);
 
-    if(myDeck.size() == 3){
+    if(myDeck.size() >= 3){
         if(middle > int(myDeck.size()) - 1){
             middle = 0;
             right = 1;
         }
         else if(right > int(myDeck.size()) - 1)
             right = 0;
-        update_cards_in_hand(left, middle, right);
     }
-    //pomyśleś co zrobić gdy size < 3
+    else if(myDeck.size() < 3)
+    {
+        if(left >= int(myDeck.size()))
+            left = -1;
+        if(middle >= int(myDeck.size()))
+            middle = -1;
+        if(right >= int(myDeck.size()))
+            right = -1;
+    }
+
+    update_cards_in_hand(left, middle, right);
 }
 
 void MainWindow::on_unoButton_clicked()
@@ -305,16 +314,29 @@ void MainWindow::update_table_card(char card[3])
     }
 }
 
-//ZMIENIĆ NAZWĘ
 //podaje już ustawione indeksy
-//co jeżeli mniej niż 3 karty
 void MainWindow::update_cards_in_hand(int l, int m, int r)
 {
     char color, specialCard, value;
 
     for(int i = 0; i < 3; i++)
     {
-        //if l or m or r == -1(?) continue;
+        if(l == -1){
+            ui->leftCardValue->hide();
+            ui->leftCard->hide();
+            continue;
+        }
+        else if(m == -1){
+            ui->middleCardValue->hide();
+            ui->middleCard->hide();
+            continue;
+        }
+        else if(r == -1){
+            ui->rightCardValue->hide();
+            ui->rightCard->hide();
+            continue;
+        }
+
         if(i == 0)  //lewa karta
         {
             color = myDeck[l][0];
