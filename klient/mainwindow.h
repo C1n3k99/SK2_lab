@@ -44,9 +44,16 @@ private slots:
 
     void on_previousCard_clicked();
 
+    void on_throwCard_clicked();
+
+    void on_unoButton_clicked();
+
+    void on_takeCard_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;
+
     vector<string> myDeck;
     char tableCard[3];
     int left, middle, right;

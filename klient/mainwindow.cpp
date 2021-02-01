@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QVector>
+#include <vector>
 #include <QFile>
 
 MainWindow::MainWindow(QWidget *parent):
@@ -72,7 +72,16 @@ void MainWindow::read_data()
     }
     else{
         //odbieram: karta-stół, czyja kolej, ilość kart każdego z graczy
+        char msg[10];
+        tcpSocket->readLine(msg, 10);
 
+        tableCard[0] = msg[0];
+        tableCard[1] = msg[1];
+        tableCard[2] = msg[2];
+
+        update_table_card(tableCard);
+        //to nie koniec
+        //ogarnąć ilość kart każdego z graczy
     }
 
 }
@@ -157,6 +166,39 @@ void MainWindow::on_nextCard_clicked()
     left = l;
     middle = m;
     right = r;
+}
+
+void MainWindow::on_throwCard_clicked()
+{
+    char card[3];
+    card[0] = myDeck[middle][0];
+    card[1] = myDeck[middle][1];
+    card[2] = myDeck[middle][2];
+
+    tcpSocket->write(card, 3);
+
+    myDeck.erase(myDeck.begin() + middle - 1);
+
+    if(myDeck.size() == 3){
+        if(middle > int(myDeck.size()) - 1){
+            middle = 0;
+            right = 1;
+        }
+        else if(right > int(myDeck.size()) - 1)
+            right = 0;
+        update_cards_in_hand(left, middle, right);
+    }
+    //pomyśleś co zrobić gdy size < 3
+}
+
+void MainWindow::on_unoButton_clicked()
+{
+
+}
+
+void MainWindow::on_takeCard_clicked()
+{
+
 }
 
 void MainWindow::on_blueButton_clicked()
@@ -265,12 +307,14 @@ void MainWindow::update_table_card(char card[3])
 
 //ZMIENIĆ NAZWĘ
 //podaje już ustawione indeksy
+//co jeżeli mniej niż 3 karty
 void MainWindow::update_cards_in_hand(int l, int m, int r)
 {
     char color, specialCard, value;
 
     for(int i = 0; i < 3; i++)
     {
+        //if l or m or r == -1(?) continue;
         if(i == 0)  //lewa karta
         {
             color = myDeck[l][0];
@@ -509,34 +553,3 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
