@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <stdio.h>
+#include<string.h>
 #include <vector>
 #include <QFile>
 
@@ -110,9 +112,9 @@ void MainWindow::read_data()
         start = false;
     }
     else{
-        //odbieram: karta-stół, czyja kolej, ilość kart każdego z graczy     
+        //odbieram: czyja kolej, karta-stół,  ilość kart każdego z graczy
         char msg[20];
-        string message;
+        string message = "";
         int turn;
 
         while(tcpSocket->bytesAvailable())
@@ -121,47 +123,89 @@ void MainWindow::read_data()
             message += msg;
         }
 
-        sscanf(message.c_str(), "%d;%s;%d;%d;%d;%d",  &turn, tableCard,
-               &numberOfCards[0], &numberOfCards[1], &numberOfCards[2], &numberOfCards[3]);
 
-        update_table_card(tableCard);
+        if(message[0] >= '0' && message[0] <= '9')
+        {
+            sscanf(message.c_str(), "%d;%s;%d;%d;%d;%d",  &turn, tableCard,
+                   &numberOfCards[0], &numberOfCards[1], &numberOfCards[2], &numberOfCards[3]);
 
-        if(turn == 0)
-            ui->yourTurn->setText(nick1);
-        else if(turn == 1)
-            ui->yourTurn->setText(nick2);
-        else if(turn == 2)
-            ui->yourTurn->setText(nick3);
-        else
-            ui->yourTurn->setText(nick4);
+            update_table_card(tableCard);
 
-        if(id == 0)
-        {
-            ui->numberOfMyCards->setText(QString::number(numberOfCards[0]));
-            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[1]));
-            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[2]));
-            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[3]));
+            if(turn == 0)
+                ui->yourTurn->setText(nick1);
+            else if(turn == 1)
+                ui->yourTurn->setText(nick2);
+            else if(turn == 2)
+                ui->yourTurn->setText(nick3);
+            else
+                ui->yourTurn->setText(nick4);
+
+            if(id == 0)
+            {
+                ui->numberOfMyCards->setText(QString::number(numberOfCards[0]));
+                ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[1]));
+                ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[2]));
+                ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[3]));
+            }
+            else if(id == 1)
+            {
+                ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[0]));
+                ui->numberOfMyCards->setText(QString::number(numberOfCards[1]));
+                ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[2]));
+                ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[3]));
+            }
+            else if(id == 2)
+            {
+                ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[0]));
+                ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[1]));
+                ui->numberOfMyCards->setText(QString::number(numberOfCards[2]));
+                ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[3]));
+            }
+            else
+            {
+                ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[0]));
+                ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[1]));
+                ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[2]));
+                ui->numberOfMyCards->setText(QString::number(numberOfCards[3]));
+            }
         }
-        else if(id == 1)
+        else if(message[0] == '!')
         {
-            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[0]));
-            ui->numberOfMyCards->setText(QString::number(numberOfCards[1]));
-            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[2]));
-            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[3]));
+            string winnerIs = "Zwyciężył ";
+
+            if(message[1] - '0' == 0)
+                winnerIs += nick1;
+            else if(message[1] - '0' == 1)
+                winnerIs += nick2;
+            else if(message[1] - '0' == 2)
+                winnerIs += nick3;
+            else
+                winnerIs += nick4;
+
+            ui->winner->setText(QString::fromStdString(winnerIs));  //string na Qstring
         }
-        else if(id == 2)
-        {
-            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[0]));
-            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[1]));
-            ui->numberOfMyCards->setText(QString::number(numberOfCards[2]));
-            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[3]));
-        }
-        else
-        {
-            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[0]));
-            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[1]));
-            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[2]));
-            ui->numberOfMyCards->setText(QString::number(numberOfCards[3]));
+        else{
+            myDeck.push_back(msg);
+            if(int(myDeck.size() == 3))
+            {
+                if(left == -1)
+                    left = 2;
+                else if(middle == -1)
+                    middle = 2;
+                else
+                    right = 2;
+                update_cards_in_hand(left, middle, right);
+            }
+            else if(myDeck.size() == 2)
+            {
+                if(left == -1)
+                    left = 1;
+                else if(middle == -1)
+                    middle = 1;
+                else
+                    right = 1;
+                update_cards_in_hand(left, middle, right);
+            }
         }
     }
 
@@ -189,7 +233,6 @@ void MainWindow::on_connectButton_clicked()
     tcpSocket->write(ui->yourNick->text().toStdString().c_str(), 20);   //zamiana qstring na char
     ui->stackedWidget->setCurrentWidget(ui->waitingPage);
 }
-
 
 void MainWindow::on_backButton_clicked()
 {
@@ -288,7 +331,13 @@ void MainWindow::on_unoButton_clicked()
 
 void MainWindow::on_takeCard_clicked()
 {
+    char take[4];
+    take[0] = char(id);
+    take[1] = 'p';
+    take[2] = 'l';
+    take[3] = 's';
 
+    tcpSocket->write(take, 4);
 }
 
 void MainWindow::on_blueButton_clicked()

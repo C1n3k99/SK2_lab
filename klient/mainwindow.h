@@ -62,6 +62,6 @@ private:
     char nick1[20], nick2[20], nick3[20], nick4[20];
     string nick;
     int numberOfCards[4] = {7, 7, 7, 7};
-    int id; //czy potrzebne?
+    int id;
 };
 #endif // MAINWINDOW_H
