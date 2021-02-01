@@ -40,6 +40,10 @@ private slots:
 
     void on_redButton_clicked();
 
+    void on_nextCard_clicked();
+
+    void on_previousCard_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;

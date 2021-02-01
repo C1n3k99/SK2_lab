@@ -65,6 +65,7 @@ void MainWindow::read_data()
         middle = 1;
         right = 2;
 
+
         //odbieranie mojego numerka
         //odbieranie nicków
         start = false;
@@ -108,6 +109,54 @@ void MainWindow::on_backButton_clicked()
 void MainWindow::on_newGameButton_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->startingPage);
+}
+
+void MainWindow::on_previousCard_clicked()
+{
+    int l, m, r;
+    if(left == int(myDeck.size()) - 1)
+        l = 0;
+    else
+        l = left + 1;
+
+    if(middle == int(myDeck.size()) - 1)
+        m = 0;
+    else
+        m = middle + 1;
+
+    if(right == int(myDeck.size()) - 1)
+        r = 0;
+    else
+        r = right + 1;
+
+    update_cards_in_hand(l, m, r);
+    left = l;
+    middle = m;
+    right = r;
+}
+
+void MainWindow::on_nextCard_clicked()
+{
+    int l, m, r;
+    if(left == 0)
+        l = myDeck.size() - 1;
+    else
+        l = left -1;
+
+    if(middle == 0)
+        m = myDeck.size() - 1;
+    else
+        m = middle - 1;
+
+    if(right == 0)
+        r = myDeck.size() - 1;
+    else
+        r = right - 1;
+
+    update_cards_in_hand(l, m, r);
+    left = l;
+    middle = m;
+    right = r;
 }
 
 void MainWindow::on_blueButton_clicked()
@@ -460,6 +509,10 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
         }
     }
 }
+
+
+
+
 
 
 
