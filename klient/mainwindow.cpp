@@ -61,33 +61,116 @@ void MainWindow::read_data()
             myDeck.push_back(myCards);
         }
         update_table_card(tableCard);
+
         left = 0;
         middle = 1;
         right = 2;
+        update_cards_in_hand(left, middle, right);
 
+        char allNicks[83];
+        while(tcpSocket->bytesAvailable())
+        {
+            tcpSocket->readLine(allNicks, 83);
+            nick += allNicks;
+        }
 
-        //odbieranie mojego numerka
-        //odbieranie nicków
+        sscanf(nick.c_str(), "%s;%s;%s;%s",  nick1, nick2, nick3, nick4);
+
+        if(strcmp(nick1, ui->yourNick->text().toStdString().c_str()) == 0)
+        {
+            id = 0;
+            ui->player1->setText(nick2);
+            ui->player2->setText(nick3);
+            ui->player3->setText(nick4);
+        }
+        else if(strcmp(nick2, ui->yourNick->text().toStdString().c_str()) == 0)
+        {
+            id = 1;
+            ui->player3->setText(nick1);
+            ui->player1->setText(nick3);
+            ui->player2->setText(nick4);
+        }
+        else if(strcmp(nick3, ui->yourNick->text().toStdString().c_str()) == 0)
+        {
+            id = 2;
+            ui->player2->setText(nick1);
+            ui->player3->setText(nick2);
+            ui->player1->setText(nick4);
+        }
+        else
+        {
+            id = 3;
+            ui->player1->setText(nick1);
+            ui->player2->setText(nick2);
+            ui->player3->setText(nick3);
+        }
+        ui->yourTurn->setText(nick1);
+
+        ui->stackedWidget->setCurrentWidget(ui->gamePage);
         start = false;
     }
     else{
-        //odbieram: karta-stół, czyja kolej, ilość kart każdego z graczy
-        char msg[10];
-        tcpSocket->readLine(msg, 10);
+        //odbieram: karta-stół, czyja kolej, ilość kart każdego z graczy     
+        char msg[20];
+        string message;
+        int turn;
 
-        tableCard[0] = msg[0];
-        tableCard[1] = msg[1];
-        tableCard[2] = msg[2];
+        while(tcpSocket->bytesAvailable())
+        {
+            tcpSocket->readLine(msg, 20);
+            message += msg;
+        }
+
+        sscanf(message.c_str(), "%d;%s;%d;%d;%d;%d",  &turn, tableCard,
+               &numberOfCards[0], &numberOfCards[1], &numberOfCards[2], &numberOfCards[3]);
 
         update_table_card(tableCard);
-        //to nie koniec
-        //ogarnąć ilość kart każdego z graczy
+
+        if(turn == 0)
+            ui->yourTurn->setText(nick1);
+        else if(turn == 1)
+            ui->yourTurn->setText(nick2);
+        else if(turn == 2)
+            ui->yourTurn->setText(nick3);
+        else
+            ui->yourTurn->setText(nick4);
+
+        if(id == 0)
+        {
+            ui->numberOfMyCards->setText(QString::number(numberOfCards[0]));
+            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[1]));
+            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[2]));
+            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[3]));
+        }
+        else if(id == 1)
+        {
+            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[0]));
+            ui->numberOfMyCards->setText(QString::number(numberOfCards[1]));
+            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[2]));
+            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[3]));
+        }
+        else if(id == 2)
+        {
+            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[0]));
+            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[1]));
+            ui->numberOfMyCards->setText(QString::number(numberOfCards[2]));
+            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[3]));
+        }
+        else
+        {
+            ui->numberOfCardsPlayer1->setText(QString::number(numberOfCards[0]));
+            ui->numberOfCardsPlayer2->setText(QString::number(numberOfCards[1]));
+            ui->numberOfCardsPlayer3->setText(QString::number(numberOfCards[2]));
+            ui->numberOfMyCards->setText(QString::number(numberOfCards[3]));
+        }
     }
 
 }
 
 void MainWindow::connection_error_occured()
 {
+    ui->stackedWidget->setCurrentWidget(ui->waitingPage);
+    ui->waitingLabel->setText("Nie można nawiązać połączenia!");
 
 }
 
@@ -95,17 +178,15 @@ void MainWindow::state_changed()
 {
     if (tcpSocket->state() == QTcpSocket::ConnectedState)
     {
-        ui->stackedWidget->setCurrentWidget(ui->gamePage);
-    }
-    else if (tcpSocket->state() == QTcpSocket::UnconnectedState)
-    {
-        ui->waitingLabel->setText("Nie można nawiązać połączenia!");
-    }
+        ui->stackedWidget->setCurrentWidget(ui->waitingPage);
+        ui->waitingLabel->setText("Oczekiwanie na graczy...");
+    } 
 }
 
 void MainWindow::on_connectButton_clicked()
 {
     tcpSocket->connectToHost(ui->yourServerAddress->text(), 1234);
+    tcpSocket->write(ui->yourNick->text().toStdString().c_str(), 20);   //zamiana qstring na char
     ui->stackedWidget->setCurrentWidget(ui->waitingPage);
 }
 

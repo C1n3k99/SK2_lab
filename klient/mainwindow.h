@@ -58,5 +58,10 @@ private:
     char tableCard[3];
     int left, middle, right;
     bool start = true;
+
+    char nick1[20], nick2[20], nick3[20], nick4[20];
+    string nick;
+    int numberOfCards[4] = {7, 7, 7, 7};
+    int id; //czy potrzebne?
 };
 #endif // MAINWINDOW_H
