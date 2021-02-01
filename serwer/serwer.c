@@ -18,16 +18,23 @@ int kolej = 0; //0-3
 int gracze = 0;
 bool wygrana = false;
 char** talia;
+char** nick;
 pthread_mutex_t talia_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t ruch_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t desc_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t start_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t start_cond = PTHREAD_COND_INITIALIZER;
 struct karta* dobierane=NULL;
 struct karta* zagrane=NULL; 
 bool ruch_jak_zegar = true;
+bool mode = false;
 int dobieranie = 1;
 bool zagrana = false;
 int tab_desc[4];
 int ile_na_rece = {7, 7, 7, 7};
+int czyja_kolej;
+char kolor;
+int sprawdzenie;
 
 struct thread_data_t
 {
@@ -85,7 +92,7 @@ void wysylanie_komunikatu(char* komunikat)
 {
     for (int i=0; i<4; i++)
     {
-        write(tab_desc[i], komunikat, 4);
+        write(tab_desc[i], komunikat, strlen(komunikat));
     }
 }
 
@@ -166,83 +173,272 @@ void przygotowanie_talii ()
     strcpy(talia[67], "b14"); //->+4
 }
 
-bool sprawdzenie_komunikatu (char* komunikat)
+int sprawdzenie_komunikatu (char* komunikat)
 {
     char* wierzch=malloc(3*sizeof(char));
     strcpy(wierzch, pop(zagrane));
     char* zagrana_karta=malloc(3*sizeof(char));
-    strcpy(zagrana_karta, komunikat[1]+komunikat[2]+komunikat[3]);
+    for (int i=1; i<4; i++)
+        zagrana_karta[i-1]=komunikat[i];
     zagrana = false;
+    char* komunikat_wys=malloc(20*sizeof(char));
     //zagranie zwykłej
-    if ((dobieranie==1 && komunikat[2]=='0' && komunikat[1]==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || komunikat[1]==wierzch[0])) ) 
-    {
-        zagrane=push(zagrane, wierzch);
-        zagrane=push(zagrane, zagrana_karta);
-        wysylanie_komunikatu();
-        zagrana = true;
-    }
-    //zagranie zmiany kolejności tury
-    else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0])) 
-    {
-        if (ruch_jak_zegar) ruch_jak_zegar=false;
-        else ruch_jak_zegar=true;
-        zagrane=push(zagrane, wierzch);
-        zagrane=push(zagrane, zagrana_karta);
-        wysylanie_komunikatu();
-        zagrana = true;
-    }
-    //zagranie stopu
-    else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0]))
-    {
-        zagrane=push(zagrane, wierzch);
-        zagrane=push(zagrane, zagrana_karta);
-        wysylanie_komunikatu();
-        zagrana = true;
-    }
-    //zagranie +2
-    else if (komunikat[2]=='1' && komunikat[3]=='2' && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (komunikat[1]==wierzch[0] && dobieranie==1)))
-    {
-        zagrane=push(zagrane, wierzch);
-        zagrane=push(zagrane, zagrana_karta);
-        if (dobieranie==1)
+    if (!mode){
+        if ((dobieranie==1 && komunikat[2]=='0' && komunikat[1]==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || komunikat[1]==wierzch[0])) ) 
         {
-            dobieranie+=1;
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            if (kolej!=atoi(komunikat[0])) kolej=atoi(komunikat[0]);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrana = true;
         }
-        else dobieranie+=2;
-        zagrana = true;
-    }
-    //zagranie +4
-    else if (komunikat[2]=='1' && komunikat[3]=='4' && atoi(komunikat[0])==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
-    {
-        zagrane=push(zagrane, wierzch);
-        zagrane=push(zagrane, zagrana_karta);
-        if (dobieranie==1)
+        //zagranie zmiany kolejności tury
+        else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0])) 
         {
-            dobieranie+=3;
+            if (ruch_jak_zegar) ruch_jak_zegar=false;
+            else ruch_jak_zegar=true;
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrana = true;
         }
-        else dobieranie+=4;
-        zagrana = true;
-    }
-    //zagranie zmiany koloru
-    else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && atoi(komunikat[0])==kolej)
-    {
-        zagrane=push(zagrane, wierzch);
-        zagrana = true;
-    }
-    //komunikat o dobraniu kart
-    else if (atoi(komunikat[0])==kolej)
-    {
-        zagrane=push(zagrane, wierzch);
-        zagrana = true;
-        wysylanie_komunikatu();
-        dobieranie=1;
+        //zagranie stopu
+        else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0]))
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) kolej = (kolej+1)%4;
+            else kolej = kolej-1;
+            if (kolej<0) kolej=kolej+4;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrana = true;
+        }
+        //zagranie +2
+        else if (komunikat[2]=='1' && komunikat[3]=='2' && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (komunikat[1]==wierzch[0] && dobieranie==1)))
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            if (dobieranie==1)
+            {
+                dobieranie+=1;
+            }
+            else dobieranie+=2;
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrana = true;
+        }
+        //zagranie +4
+        else if (komunikat[2]=='1' && komunikat[3]=='4' && atoi(komunikat[0])==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            if (dobieranie==1)
+            {
+                dobieranie+=3;
+            }
+            else dobieranie+=4;
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            read(tab_desc[kolej], kolor, 1);
+            zagrana = true;
+            mode=true;
+        }
+        //zagranie zmiany koloru
+        else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && atoi(komunikat[0])==kolej)
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            read(tab_desc[kolej], kolor, 1);
+            zagrana = true;
+            mode=true;
+        }
+        //komunikat o dobraniu kart
+        else if (atoi(komunikat[0])==kolej && komunikat[1]=='p')
+        {
+            ile_na_rece[kolej]+=dobieranie;
+            for (int i=0; i<4;i++)
+            {
+                wysylanie_komunikatu(pop(dobierane));
+                //tu sprawdzic czy nie jest pusta talia do dobierania
+            }
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, wierzch, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrane=push(zagrane, wierzch);
+            dobieranie=1;
+            zagrana = true;
+        }
+        //komunikat o UNO
+        else if ()
+        {
+
+        }
+    } else //czarna{
+        if ((dobieranie==1 && komunikat[2]=='0' && kolor==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || kolor==wierzch[0])) ) 
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            if (kolej!=atoi(komunikat[0])) kolej=atoi(komunikat[0]);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            mode=false;
+            zagrana = true;
+        }
+        //zagranie zmiany kolejności tury
+        else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || kolor==wierzch[0])) 
+        {
+            if (ruch_jak_zegar) ruch_jak_zegar=false;
+            else ruch_jak_zegar=true;
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrana = true;
+            mode=false;
+        }
+        //zagranie stopu
+        else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || kolor==wierzch[0]))
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) kolej = (kolej+1)%4;
+            else kolej = kolej-1;
+            if (kolej<0) kolej=kolej+4;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrana = true;
+            mode=false;
+        }
+        //zagranie +2
+        else if (komunikat[2]=='1' && komunikat[3]=='2' && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (kolor==wierzch[0] && dobieranie==1)))
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            if (dobieranie==1)
+            {
+                dobieranie+=1;
+            }
+            else dobieranie+=2;
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrana = true;
+            mode=false;
+        }
+        //zagranie +4
+        else if (komunikat[2]=='1' && komunikat[3]=='4' && atoi(komunikat[0])==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            if (dobieranie==1)
+            {
+                dobieranie+=3;
+            }
+            else dobieranie+=4;
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            read(tab_desc[kolej], kolor, 1);
+            zagrana = true;
+        }
+        //zagranie zmiany koloru
+        else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && atoi(komunikat[0])==kolej)
+        {
+            zagrane=push(zagrane, wierzch);
+            zagrane=push(zagrane, zagrana_karta);
+            ile_na_rece[kolej]--;
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            read(tab_desc[kolej], kolor, 1);
+            zagrana = true;
+        }
+        //komunikat o dobraniu kart
+        else if (atoi(komunikat[0])==kolej && komunikat[1]=='p')
+        {
+            ile_na_rece[kolej]+=dobieranie;
+            for (int i=0; i<4;i++)
+            {
+                wysylanie_komunikatu(pop(dobierane));
+                //tu sprawdzic czy nie jest pusta talia do dobierania
+            }
+            if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
+            else czyja_kolej = kolej-1;
+            if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
+            sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, wierzch, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            wysylanie_komunikatu(komunikat_wys);
+            zagrane=push(zagrane, wierzch);
+            dobieranie=1;
+            zagrana = true;
+        }
+        //komunikat o UNO
+        else if ()
+        {
+
+        }
     }
     if (zagrana) {
-        if (ruch_jak_zegar) kolej+=1;
-        else kolej -=1;}
+        if (ruch_jak_zegar) kolej = (kolej+1)%4;
+        else kolej = kolej-1;}
+    if (kolej<0) kolej=kolej+4;
     free(wierzch);
-    //trzeba jakoś sprawdzić czy jest wygrana
-    //trzeba ogarnac jaki komunikat gdy lezy czarna karta
+    free(komunikat_wys);
+    if (ile_na_rece[0]==0) return 0;
+    if (ile_na_rece[1]==0) return 1;
+    if (ile_na_rece[2]==0) return 2;
+    if (ile_na_rece[3]==0) return 3;
+    return 4;
 }
 
 void *ThreadBehavior(void *t_data)
@@ -250,7 +446,24 @@ void *ThreadBehavior(void *t_data)
     pthread_detach(pthread_self());
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
     int desc = th_data->my_socket;
+    nick = malloc(4*sizeof(char*));
+    if (th_data->my_turn<3)
+    {
+        pthread_mutex_lock(&start_mutex);
+
+        pthread_cond_wait(&start_cond, &start_mutex);
+
+        pthread_mutex_unlock(&start_mutex);
+    }
+    else
+    {
+        pthread_cond_broadcast(&start_cond);
+    }
     pthread_mutex_lock(&talia_mutex);
+    for (int i=0; i<4;i++)
+    {
+        nick[i]=malloc(20*sizeof(char));
+    }
     if (th_data->my_turn==0)
     {
         int indeks=28;
@@ -268,6 +481,7 @@ void *ThreadBehavior(void *t_data)
         }
         zagrane=push(zagrane, talia[28]);
     }
+    
     write(desc, talia[28], 3);
     for (int i=th_data->my_turn*7; i<(th_data->my_turn+1)*7;i++)
     {
@@ -279,19 +493,31 @@ void *ThreadBehavior(void *t_data)
         {
             dobierane=push(dobierane, talia[i]);
         }
+        
     }
-    write(desc, nick[0], 20);
+    char* global_nick=malloc(83*sizeof(char));
+    sprintf(global_nick, "%s;%s;%s;%s", nick[0], nick[1], nick[2], nick[3]);
+    write(desc, global_nick, 83);
+    free(global_nick);
     pthread_mutex_unlock(&talia_mutex);
     char* komunikat=malloc(4*sizeof(char));
     while(!wygrana)
     {
+        //przyjęcie jaka karta
         read(desc, komunikat, 4);
         pthread_mutex_lock(&ruch_mutex);
         if (!wygrana)
-        {
-            if (sprawdzenie_komunikatu(komunikat))
+        {   
+            sprawdzenie=sprawdzenie_komunikatu(komunikat);
+            if (sprawdzenie<4)
             {
-
+                wygrana=true;
+                char zwyciezca = sprawdzenie + '0';
+                char* komunikat_koniec=malloc(2*sizeof(char));
+                char[0]='!';
+                char[1]=zwyciezca;
+                wysylanie_komunikatu()
+                free(komunikat_koniec);
             }
         }
         pthread_mutex_unlock(&ruch_mutex);
