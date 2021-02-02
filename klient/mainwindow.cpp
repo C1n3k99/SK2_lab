@@ -55,11 +55,11 @@ MainWindow::~MainWindow()
 void MainWindow::read_data()
 {
     if(start){
-        char myCards[3];
+        char myCards[4];
 
-        tcpSocket->readLine(tableCard, 3);
+        tcpSocket->readLine(tableCard, 4);
         for(int i = 0; i < 7; i++){
-            tcpSocket->readLine(myCards, 3);
+            tcpSocket->readLine(myCards, 4);
             myDeck.push_back(myCards);
         }
         update_table_card(tableCard);
@@ -76,7 +76,7 @@ void MainWindow::read_data()
             nick += allNicks;
         }
 
-        sscanf(nick.c_str(), "%s;%s;%s;%s",  nick1, nick2, nick3, nick4);
+        sscanf(nick.c_str(), "%[^;];%[^;];%[^;];%[^;]",  nick1, nick2, nick3, nick4);
 
         if(strcmp(nick1, ui->yourNick->text().toStdString().c_str()) == 0)
         {
@@ -294,14 +294,15 @@ void MainWindow::on_nextCard_clicked()
 
 void MainWindow::on_throwCard_clicked()
 {
-    char card[3];
-    card[0] = myDeck[middle][0];
-    card[1] = myDeck[middle][1];
-    card[2] = myDeck[middle][2];
+    char card[4];
+    card[0] = char(id);
+    card[1] = myDeck[middle][0];
+    card[2] = myDeck[middle][1];
+    card[3] = myDeck[middle][2];
 
-    tcpSocket->write(card, 3);
+    tcpSocket->write(card, 4);
 
-    myDeck.erase(myDeck.begin() + middle - 1);
+    myDeck.erase(myDeck.begin() + middle);
 
     if(myDeck.size() >= 3){
         if(middle > int(myDeck.size()) - 1){
@@ -350,27 +351,43 @@ void MainWindow::on_blueButton_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->gamePage);
     ui->demandingColor->setText("Żądany kolor:\nNIEBIESKI");
+    char color[2];
+    color[0] = 'n';
+    color[1] = 'n';
+    tcpSocket->write(color, 2);
 }
 
 void MainWindow::on_yellowButton_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->gamePage);
     ui->demandingColor->setText("Żądany kolor:\nŻÓŁTY");
+    char color[2];
+    color[0] = 'y';
+    color[1] = 'y';
+    tcpSocket->write(color, 2);
 }
 
 void MainWindow::on_greenButton_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->gamePage);
     ui->demandingColor->setText("Żądany kolor:\nZIELONY");
+    char color[2];
+    color[0] = 'z';
+    color[1] = 'z';
+    tcpSocket->write(color, 2);
 }
 
 void MainWindow::on_redButton_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->gamePage);
     ui->demandingColor->setText("Żądany kolor:\nCZERWONY");
+    char color[2];
+    color[0] = 'c';
+    color[1] = 'c';
+    tcpSocket->write(color, 2);
 }
 
-void MainWindow::update_table_card(char card[3])
+void MainWindow::update_table_card(char card[4])
 {    //0 - kolor(n,y,z,c,b); 1 - specjalne 0=nie 1=tak; 2 - wartosc: cyferki, 0=zmiana kolejki 1=Ø 2=+2 3=zmiana koloru 4=+4
     char color = card[0];
     char specialCard = card[1];
@@ -446,6 +463,7 @@ void MainWindow::update_table_card(char card[3])
             break;
         case '4':
             ui->tableCardValue->setText("+4");
+            break;
         }
     }
 }
@@ -549,6 +567,7 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                     break;
                 case '4':
                     ui->leftCardValue->setText("+4");
+                    break;
                 }
             }
         }
@@ -628,6 +647,7 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                     break;
                 case '4':
                     ui->middleCardValue->setText("+4");
+                    break;
                 }
             }
         }
@@ -706,6 +726,7 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                     break;
                 case '4':
                     ui->rightCardValue->setText("+4");
+                    break;
                 }
             }
         }

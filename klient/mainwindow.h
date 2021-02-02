@@ -55,7 +55,7 @@ private:
     QTcpSocket *tcpSocket;
 
     vector<string> myDeck;
-    char tableCard[3];
+    char tableCard[4];
     int left, middle, right;
     bool start = true;
 
