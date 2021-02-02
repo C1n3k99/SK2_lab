@@ -12,12 +12,13 @@
 #include <string.h>
 #include <pthread.h>
 #include <time.h>
-#include <stos.h>
+#include "stos.h"
 
 int kolej = 0; //0-3
 int gracze = 0;
 bool wygrana = false;
 char** talia;
+char** nowa_talia;
 char** nick;
 pthread_mutex_t talia_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t ruch_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -30,17 +31,23 @@ bool ruch_jak_zegar = true;
 bool mode = false;
 int dobieranie = 1;
 bool zagrana = false;
+bool uno = false;
+int uno_gracz;
 int tab_desc[4];
-int ile_na_rece = {7, 7, 7, 7};
+int ile_na_rece[4] = {7, 7, 7, 7};
 int czyja_kolej;
-char kolor;
+char kolor[2];
 int sprawdzenie;
+int rozmiar_zagrane=0;
+int rozmiar_dobierane=0;
+
 
 struct thread_data_t
 {
     int my_socket;
     int my_turn;
 };
+
 
 void bubblesort(int table[], int size)
 {
@@ -70,7 +77,7 @@ void tasowanie (char** talia)
         T[i]=rand()%10000;
         T2[i]=T[i];
     }
-    bubblesort(&T, ilosc);
+    bubblesort(T, ilosc);
     char* temp=malloc(3*sizeof(char));
     for (int j=0;j<ilosc;j++)
     {
@@ -176,7 +183,7 @@ void przygotowanie_talii ()
 int sprawdzenie_komunikatu (char* komunikat)
 {
     char* wierzch=malloc(3*sizeof(char));
-    strcpy(wierzch, pop(zagrane));
+    strcpy(wierzch, zagrane->rodzaj);
     char* zagrana_karta=malloc(3*sizeof(char));
     for (int i=1; i<4; i++)
         zagrana_karta[i-1]=komunikat[i];
@@ -184,12 +191,59 @@ int sprawdzenie_komunikatu (char* komunikat)
     char* komunikat_wys=malloc(20*sizeof(char));
     //zagranie zwykłej
     if (!mode){
-        if ((dobieranie==1 && komunikat[2]=='0' && komunikat[1]==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || komunikat[1]==wierzch[0])) ) 
+        if ((dobieranie==1 && komunikat[2]=='0' && komunikat[1]==wierzch[0] && (int)(wierzch[2]-'0')==((int)(komunikat[3]-'0')+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && (int)(komunikat[0]-'0')==kolej && (komunikat[3]==wierzch[2] || komunikat[1]==wierzch[0])) ) 
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
-            if (kolej!=atoi(komunikat[0])) kolej=atoi(komunikat[0]);
+            rozmiar_zagrane+=1;
+            if (kolej!=(int)(komunikat[0]-'0')) kolej=(int)(komunikat[0]-'0');
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -198,13 +252,60 @@ int sprawdzenie_komunikatu (char* komunikat)
             zagrana = true;
         }
         //zagranie zmiany kolejności tury
-        else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0])) 
+        else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && (int)(komunikat[0]-'0')==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0])) 
         {
             if (ruch_jak_zegar) ruch_jak_zegar=false;
             else ruch_jak_zegar=true;
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -213,11 +314,58 @@ int sprawdzenie_komunikatu (char* komunikat)
             zagrana = true;
         }
         //zagranie stopu
-        else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0]))
+        else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && (int)(komunikat[0]-'0')==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || komunikat[1]==wierzch[0]))
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) kolej = (kolej+1)%4;
             else kolej = kolej-1;
             if (kolej<0) kolej=kolej+4;
@@ -229,16 +377,63 @@ int sprawdzenie_komunikatu (char* komunikat)
             zagrana = true;
         }
         //zagranie +2
-        else if (komunikat[2]=='1' && komunikat[3]=='2' && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (komunikat[1]==wierzch[0] && dobieranie==1)))
+        else if (komunikat[2]=='1' && komunikat[3]=='2' && (int)(komunikat[0]-'0')==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (komunikat[1]==wierzch[0] && dobieranie==1)))
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             if (dobieranie==1)
             {
                 dobieranie+=1;
             }
             else dobieranie+=2;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -247,16 +442,63 @@ int sprawdzenie_komunikatu (char* komunikat)
             zagrana = true;
         }
         //zagranie +4
-        else if (komunikat[2]=='1' && komunikat[3]=='4' && atoi(komunikat[0])==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
+        else if (komunikat[2]=='1' && komunikat[3]=='4' && (int)(komunikat[0]-'0')==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             if (dobieranie==1)
             {
                 dobieranie+=3;
             }
             else dobieranie+=4;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -267,11 +509,58 @@ int sprawdzenie_komunikatu (char* komunikat)
             mode=true;
         }
         //zagranie zmiany koloru
-        else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && atoi(komunikat[0])==kolej)
+        else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && (int)(komunikat[0]-'0')==kolej)
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -282,35 +571,113 @@ int sprawdzenie_komunikatu (char* komunikat)
             mode=true;
         }
         //komunikat o dobraniu kart
-        else if (atoi(komunikat[0])==kolej && komunikat[1]=='p')
+        else if ((int)(komunikat[0]-'0')==kolej && komunikat[1]=='p')
         {
             ile_na_rece[kolej]+=dobieranie;
-            for (int i=0; i<4;i++)
-            {
-                wysylanie_komunikatu(pop(dobierane));
-                //tu sprawdzic czy nie jest pusta talia do dobierania
+            for (int i=0; i<dobieranie;i++)
+            {   
+                if (dobierane==NULL)
+                {
+                    char gorna[3];
+                    strcpy(gorna, zagrane->rodzaj);
+                    zagrane=pop(zagrane);
+                    nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                    {
+                        nowa_talia[i]=malloc(3*sizeof(char));
+                    }
+                    for (int i=0;zagrane!=NULL;i++)
+                    {
+                        strcpy(nowa_talia[i], zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                    }
+                    tasowanie(nowa_talia);
+                    rozmiar_dobierane=0;
+                    int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                    for (int i=0;i<rozmiar;i++)
+                    {
+                        dobierane=push(dobierane, nowa_talia[i]);
+                        rozmiar_dobierane+=1;
+                    }
+                    zagrane=push(zagrane, gorna);
+                    rozmiar_zagrane=1;
+                for (int i=0; i<rozmiar_zagrane;i++)
+                    {
+                        free(nowa_talia[i]);
+                    }
+                free(nowa_talia);
+                }
+                write(tab_desc[(int)(komunikat[0]-'0')],dobierane->rodzaj,3);
+                dobierane=pop(dobierane);
             }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, wierzch, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
             wysylanie_komunikatu(komunikat_wys);
-            zagrane=push(zagrane, wierzch);
             dobieranie=1;
             zagrana = true;
         }
         //komunikat o UNO
-        else if ()
+        else if (komunikat[1]=='u')
         {
-
+            if ((int)(komunikat[0]-'0')==uno_gracz) uno = false;
         }
-    } else //czarna{
-        if ((dobieranie==1 && komunikat[2]=='0' && kolor==wierzch[0] && atoi(wierzch[2])==(atoi(komunikat[3])+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && atoi(komunikat[0])==kolej && (komunikat[3]==wierzch[2] || kolor==wierzch[0])) ) 
+    } else //czarna
         {
-            zagrane=push(zagrane, wierzch);
+        if ((dobieranie==1 && komunikat[2]=='0' && kolor[0]==wierzch[0] && (int)(wierzch[2]-'0')==((int)(komunikat[3]-'0')+1)%10)|| (dobieranie==1 && komunikat[2]=='0' && (int)(komunikat[0]-'0')==kolej && (komunikat[3]==wierzch[2] || kolor[0]==wierzch[0])) ) 
+        {
             zagrane=push(zagrane, zagrana_karta);
-            if (kolej!=atoi(komunikat[0])) kolej=atoi(komunikat[0]);
+            rozmiar_zagrane+=1;
+            if (kolej!=(int)(komunikat[0]-'0')) kolej=(int)(komunikat[0]-'0');
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -320,13 +687,60 @@ int sprawdzenie_komunikatu (char* komunikat)
             zagrana = true;
         }
         //zagranie zmiany kolejności tury
-        else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || kolor==wierzch[0])) 
+        else if (komunikat[2]=='1' && komunikat[3]=='0' && dobieranie==1 && (int)(komunikat[0]-'0')==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || kolor[0]==wierzch[0])) 
         {
             if (ruch_jak_zegar) ruch_jak_zegar=false;
             else ruch_jak_zegar=true;
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -336,11 +750,58 @@ int sprawdzenie_komunikatu (char* komunikat)
             mode=false;
         }
         //zagranie stopu
-        else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || kolor==wierzch[0]))
+        else if (komunikat[2]=='1' && komunikat[3]=='1' && dobieranie==1 && (int)(komunikat[0]-'0')==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || kolor[0]==wierzch[0]))
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) kolej = (kolej+1)%4;
             else kolej = kolej-1;
             if (kolej<0) kolej=kolej+4;
@@ -353,16 +814,63 @@ int sprawdzenie_komunikatu (char* komunikat)
             mode=false;
         }
         //zagranie +2
-        else if (komunikat[2]=='1' && komunikat[3]=='2' && atoi(komunikat[0])==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (kolor==wierzch[0] && dobieranie==1)))
+        else if (komunikat[2]=='1' && komunikat[3]=='2' && (int)(komunikat[0]-'0')==kolej && ((wierzch[1]==komunikat[2] && wierzch[2]==komunikat[3]) || (kolor[0]==wierzch[0] && dobieranie==1)))
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             if (dobieranie==1)
             {
                 dobieranie+=1;
             }
             else dobieranie+=2;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -372,16 +880,63 @@ int sprawdzenie_komunikatu (char* komunikat)
             mode=false;
         }
         //zagranie +4
-        else if (komunikat[2]=='1' && komunikat[3]=='4' && atoi(komunikat[0])==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
+        else if (komunikat[2]=='1' && komunikat[3]=='4' && (int)(komunikat[0]-'0')==kolej && (komunikat[2]!='1' || komunikat[3]!='2' || dobieranie==1))
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             if (dobieranie==1)
             {
                 dobieranie+=3;
             }
             else dobieranie+=4;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -391,11 +946,58 @@ int sprawdzenie_komunikatu (char* komunikat)
             zagrana = true;
         }
         //zagranie zmiany koloru
-        else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && atoi(komunikat[0])==kolej)
+        else if (komunikat[2]=='1' && komunikat[3]=='3' && dobieranie==1 && (int)(komunikat[0]-'0')==kolej)
         {
-            zagrane=push(zagrane, wierzch);
             zagrane=push(zagrane, zagrana_karta);
+            rozmiar_zagrane+=1;
             ile_na_rece[kolej]--;
+            if (uno){
+                uno=false;
+                ile_na_rece[kolej]+=2;
+                for (int i=0; i<2;i++)
+                {   
+                    if (dobierane==NULL)
+                    {
+                        char gorna[3];
+                        strcpy(gorna, zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                        nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                        for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            nowa_talia[i]=malloc(3*sizeof(char));
+                        }
+                        for (int i=0;zagrane!=NULL;i++)
+                        {
+                            strcpy(nowa_talia[i], zagrane->rodzaj);
+                            zagrane=pop(zagrane);
+                        }
+                        tasowanie(nowa_talia);
+                        rozmiar_dobierane=0;
+                        int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                        for (int i=0;i<rozmiar;i++)
+                        {
+                            dobierane=push(dobierane, nowa_talia[i]);
+                            rozmiar_dobierane+=1;
+                        }
+                        zagrane=push(zagrane, gorna);
+                        rozmiar_zagrane=1;
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                        {
+                            free(nowa_talia[i]);
+                        }
+                    free(nowa_talia);
+                    }
+                    write(tab_desc[uno_gracz],dobierane->rodzaj,3);
+                    dobierane=pop(dobierane);
+                }
+            }
+            for (int i=0;i<4;i++)
+            {
+                if (ile_na_rece[i]==1) {
+                    uno=true;
+                    uno_gracz=i;
+                }
+            }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
@@ -405,12 +1007,44 @@ int sprawdzenie_komunikatu (char* komunikat)
             zagrana = true;
         }
         //komunikat o dobraniu kart
-        else if (atoi(komunikat[0])==kolej && komunikat[1]=='p')
+        else if ((int)(komunikat[0]-'0')==kolej && komunikat[1]=='p')
         {
             ile_na_rece[kolej]+=dobieranie;
-            for (int i=0; i<4;i++)
-            {
-                wysylanie_komunikatu(pop(dobierane));
+            for (int i=0; i<dobieranie;i++)
+            {   
+                if (dobierane==NULL)
+                {
+                    char gorna[3];
+                    strcpy(gorna, zagrane->rodzaj);
+                    zagrane=pop(zagrane);
+                    nowa_talia = malloc(rozmiar_zagrane*sizeof(char*));
+                    for (int i=0; i<rozmiar_zagrane;i++)
+                    {
+                        nowa_talia[i]=malloc(3*sizeof(char));
+                    }
+                    for (int i=0;zagrane!=NULL;i++)
+                    {
+                        strcpy(nowa_talia[i], zagrane->rodzaj);
+                        zagrane=pop(zagrane);
+                    }
+                    tasowanie(nowa_talia);
+                    rozmiar_dobierane=0;
+                    int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
+                    for (int i=0;i<rozmiar;i++)
+                    {
+                        dobierane=push(dobierane, nowa_talia[i]);
+                        rozmiar_dobierane+=1;
+                    }
+                    zagrane=push(zagrane, gorna);
+                    rozmiar_zagrane=1;
+                for (int i=0; i<rozmiar_zagrane;i++)
+                    {
+                        free(nowa_talia[i]);
+                    }
+                free(nowa_talia);
+                }
+                write(tab_desc[(int)(komunikat[0]-'0')],dobierane->rodzaj,3);
+                dobierane=pop(dobierane);
                 //tu sprawdzic czy nie jest pusta talia do dobierania
             }
             if (ruch_jak_zegar) czyja_kolej = (kolej+1)%4;
@@ -418,14 +1052,13 @@ int sprawdzenie_komunikatu (char* komunikat)
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, wierzch, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
             wysylanie_komunikatu(komunikat_wys);
-            zagrane=push(zagrane, wierzch);
             dobieranie=1;
             zagrana = true;
         }
         //komunikat o UNO
-        else if ()
+        else if (komunikat[1]=='u')
         {
-
+            if ((int)(komunikat[0]-'0')==uno_gracz) uno = false;
         }
     }
     if (zagrana) {
@@ -480,6 +1113,7 @@ void *ThreadBehavior(void *t_data)
             free(swap);
         }
         zagrane=push(zagrane, talia[28]);
+        rozmiar_zagrane+=1;
     }
     
     write(desc, talia[28], 3);
@@ -492,6 +1126,7 @@ void *ThreadBehavior(void *t_data)
         for (int i=29;i<68;i++)
         {
             dobierane=push(dobierane, talia[i]);
+            rozmiar_dobierane+=1;
         }
         
     }
@@ -514,9 +1149,9 @@ void *ThreadBehavior(void *t_data)
                 wygrana=true;
                 char zwyciezca = sprawdzenie + '0';
                 char* komunikat_koniec=malloc(2*sizeof(char));
-                char[0]='!';
-                char[1]=zwyciezca;
-                wysylanie_komunikatu()
+                komunikat_koniec[0]='!';
+                komunikat_koniec[1]=zwyciezca;
+                wysylanie_komunikatu(komunikat_koniec);
                 free(komunikat_koniec);
             }
         }
