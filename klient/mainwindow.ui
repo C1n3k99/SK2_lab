@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="startingPage">
        <widget class="QPushButton" name="connectButton">
@@ -1350,7 +1350,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Wygrałeś!</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

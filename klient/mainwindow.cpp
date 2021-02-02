@@ -326,7 +326,13 @@ void MainWindow::on_throwCard_clicked()
 
 void MainWindow::on_unoButton_clicked()
 {
+    char uno[4];
+    uno[0] = char(id);
+    uno[1] = 'u';
+    uno[2] = 'n';
+    uno[3] = 'o';
 
+    tcpSocket->write(uno, 4);
 }
 
 void MainWindow::on_takeCard_clicked()
