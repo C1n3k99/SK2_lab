@@ -504,7 +504,7 @@ int sprawdzenie_komunikatu (char* komunikat)
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
             wysylanie_komunikatu(komunikat_wys);
-            read(tab_desc[kolej], kolor, 1);
+            read(tab_desc[kolej], kolor[0], 2);
             zagrana = true;
             mode=true;
         }
@@ -566,7 +566,7 @@ int sprawdzenie_komunikatu (char* komunikat)
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
             wysylanie_komunikatu(komunikat_wys);
-            read(tab_desc[kolej], kolor, 1);
+            read(tab_desc[kolej], kolor[0], 2);
             zagrana = true;
             mode=true;
         }
@@ -942,7 +942,7 @@ int sprawdzenie_komunikatu (char* komunikat)
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
             wysylanie_komunikatu(komunikat_wys);
-            read(tab_desc[kolej], kolor, 1);
+            read(tab_desc[kolej], kolor[0], 2);
             zagrana = true;
         }
         //zagranie zmiany koloru
@@ -1003,7 +1003,7 @@ int sprawdzenie_komunikatu (char* komunikat)
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
             wysylanie_komunikatu(komunikat_wys);
-            read(tab_desc[kolej], kolor, 1);
+            read(tab_desc[kolej], kolor[0], 2);
             zagrana = true;
         }
         //komunikat o dobraniu kart

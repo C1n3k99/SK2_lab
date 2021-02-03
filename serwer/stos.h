@@ -8,6 +8,7 @@
 struct karta
 {
     char rodzaj[3];
+    int rozmiar;
     struct karta* nastepna;
 };
 
