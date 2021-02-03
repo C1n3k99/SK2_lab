@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="startingPage">
        <widget class="QPushButton" name="connectButton">
@@ -847,33 +847,6 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="player3">
-        <property name="geometry">
-         <rect>
-          <x>50</x>
-          <y>160</y>
-          <width>221</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Calibri</family>
-          <pointsize>14</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="text">
-         <string>gracz_3</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
        <widget class="QPushButton" name="takeCard">
         <property name="geometry">
          <rect>
@@ -1229,8 +1202,33 @@
          </item>
         </layout>
        </widget>
+       <widget class="QLabel" name="player3">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>160</y>
+          <width>221</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>gracz_3</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignHCenter|Qt::AlignTop</set>
+        </property>
+       </widget>
       </widget>
-      <widget class="QWidget" name="chooseCardPage">
+      <widget class="QWidget" name="chooseColorPage">
        <widget class="QPushButton" name="blueButton">
         <property name="geometry">
          <rect>

@@ -54,7 +54,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::read_data()
 {
-    if(start){
+    if(start){              //pierwszy komunikat
         char myCards[4];
 
         tcpSocket->readLine(tableCard, 4);
@@ -112,7 +112,6 @@ void MainWindow::read_data()
         start = false;
     }
     else{
-        //odbieram: czyja kolej, karta-stół,  ilość kart każdego z graczy
         char msg[20];
         string message = "";
         int turn;
@@ -124,12 +123,32 @@ void MainWindow::read_data()
         }
 
 
-        if(message[0] >= '0' && message[0] <= '9')
+        if(message[0] >= '0' && message[0] <= '9')      //komunikaty cykliczne - odbieram: czyja kolej, karta-stół,  ilość kart każdego z graczy
         {
-            sscanf(message.c_str(), "%d;%s;%d;%d;%d;%d",  &turn, tableCard,
+            sscanf(message.c_str(), "%d;%[^;];%d;%d;%d;%d",  &turn, tableCard,
                    &numberOfCards[0], &numberOfCards[1], &numberOfCards[2], &numberOfCards[3]);
 
             update_table_card(tableCard);
+
+            if(tableCard[0] == 'b'){
+                if(demand)
+                {
+                    int playerChoosingColor;
+                    if(turn == 0)
+                        playerChoosingColor = 3;
+                    else
+                        playerChoosingColor = turn - 1;
+
+                    if(id == playerChoosingColor)
+                    {
+                        ui->stackedWidget->setCurrentWidget(ui->chooseColorPage);
+                        demand = false;
+                    }
+                }
+            }
+            else
+                ui->demandingColor->setText("");
+
 
             if(turn == 0)
                 ui->yourTurn->setText(nick1);
@@ -169,7 +188,7 @@ void MainWindow::read_data()
                 ui->numberOfMyCards->setText(QString::number(numberOfCards[3]));
             }
         }
-        else if(message[0] == '!')
+        else if(message[0] == '!')      //komunikat o wygranej
         {
             string winnerIs = "Zwyciężył ";
 
@@ -184,9 +203,9 @@ void MainWindow::read_data()
 
             ui->winner->setText(QString::fromStdString(winnerIs));  //string na Qstring
         }
-        else{
+        else{                           //dobieranie karty
             myDeck.push_back(msg);
-            if(int(myDeck.size() == 3))
+            if(int(myDeck.size() == 2))
             {
                 if(left == -1)
                     left = 2;
@@ -196,7 +215,7 @@ void MainWindow::read_data()
                     right = 2;
                 update_cards_in_hand(left, middle, right);
             }
-            else if(myDeck.size() == 2)
+            else if(myDeck.size() == 1)
             {
                 if(left == -1)
                     left = 1;
@@ -247,20 +266,36 @@ void MainWindow::on_newGameButton_clicked()
 void MainWindow::on_previousCard_clicked()
 {
     int l, m, r;
-    if(left == int(myDeck.size()) - 1)
-        l = 0;
-    else
-        l = left + 1;
 
-    if(middle == int(myDeck.size()) - 1)
-        m = 0;
-    else
-        m = middle + 1;
+    if(myDeck.size() >= 3)
+    {
+        if(left == int(myDeck.size()) - 1)
+            l = 0;
+        else
+            l = left + 1;
 
-    if(right == int(myDeck.size()) - 1)
-        r = 0;
-    else
-        r = right + 1;
+        if(middle == int(myDeck.size()) - 1)
+            m = 0;
+        else
+            m = middle + 1;
+
+        if(right == int(myDeck.size()) - 1)
+            r = 0;
+        else
+            r = right + 1;
+    }
+    else if(myDeck.size() == 2)
+    {
+        left = -1;
+        if(middle == 1){
+            middle = 0;
+            right = 1;
+        }
+        else{
+            middle = 1;
+            right = 0;
+        }
+    }
 
     update_cards_in_hand(l, m, r);
     left = l;
@@ -271,20 +306,36 @@ void MainWindow::on_previousCard_clicked()
 void MainWindow::on_nextCard_clicked()
 {
     int l, m, r;
-    if(left == 0)
-        l = myDeck.size() - 1;
-    else
-        l = left -1;
 
-    if(middle == 0)
-        m = myDeck.size() - 1;
-    else
-        m = middle - 1;
+    if(myDeck.size() >= 3)
+    {
+        if(left == 0)
+            l = myDeck.size() - 1;
+        else
+            l = left -1;
 
-    if(right == 0)
-        r = myDeck.size() - 1;
-    else
-        r = right - 1;
+        if(middle == 0)
+            m = myDeck.size() - 1;
+        else
+            m = middle - 1;
+
+        if(right == 0)
+            r = myDeck.size() - 1;
+        else
+            r = right - 1;
+    }
+    else if(myDeck.size() == 2)
+    {
+        left = -1;
+        if(middle == 1){
+            middle = 0;
+            right = 1;
+        }
+        else{
+            middle = 1;
+            right = 0;
+        }
+    }
 
     update_cards_in_hand(l, m, r);
     left = l;
@@ -295,12 +346,17 @@ void MainWindow::on_nextCard_clicked()
 void MainWindow::on_throwCard_clicked()
 {
     char card[4];
-    card[0] = char(id);
+    card[0] = id + '0';
     card[1] = myDeck[middle][0];
     card[2] = myDeck[middle][1];
     card[3] = myDeck[middle][2];
 
     tcpSocket->write(card, 4);
+
+    if(card[1] == 'b')
+        demand = true;
+    else
+        demand = false;
 
     myDeck.erase(myDeck.begin() + middle);
 
@@ -311,15 +367,27 @@ void MainWindow::on_throwCard_clicked()
         }
         else if(right > int(myDeck.size()) - 1)
             right = 0;
+        else if(left > int(myDeck.size()) - 1)
+            left = int(myDeck.size()) - 1;
     }
-    else if(myDeck.size() < 3)
+    else if(myDeck.size() == 2)
     {
-        if(left >= int(myDeck.size()))
+        if(right > 0)
+        {
             left = -1;
-        if(middle >= int(myDeck.size()))
-            middle = -1;
-        if(right >= int(myDeck.size()))
-            right = -1;
+            middle = 0;
+            right = 1;
+        }
+        else{
+            left = -1;
+            middle = 1;
+            right = 0;
+        }
+    }
+    else{
+        left = -1;
+        middle = 0;
+        right  = -1;
     }
 
     update_cards_in_hand(left, middle, right);
@@ -328,7 +396,7 @@ void MainWindow::on_throwCard_clicked()
 void MainWindow::on_unoButton_clicked()
 {
     char uno[4];
-    uno[0] = char(id);
+    uno[0] = id + '0';
     uno[1] = 'u';
     uno[2] = 'n';
     uno[3] = 'o';
@@ -339,7 +407,7 @@ void MainWindow::on_unoButton_clicked()
 void MainWindow::on_takeCard_clicked()
 {
     char take[4];
-    take[0] = char(id);
+    take[0] = id + '0';
     take[1] = 'p';
     take[2] = 'l';
     take[3] = 's';
@@ -459,7 +527,6 @@ void MainWindow::update_table_card(char card[4])
             break;
         case '3':
             ui->tableCardValue->setText("");
-            ui->stackedWidget->setCurrentWidget(ui->chooseCardPage);
             break;
         case '4':
             ui->tableCardValue->setText("+4");
@@ -472,24 +539,28 @@ void MainWindow::update_table_card(char card[4])
 void MainWindow::update_cards_in_hand(int l, int m, int r)
 {
     char color, specialCard, value;
-
+    bool help;
     for(int i = 0; i < 3; i++)
     {
+        help = false;
         if(l == -1){
             ui->leftCardValue->hide();
             ui->leftCard->hide();
-            continue;
+            help = true;
         }
-        else if(m == -1){
+        if(m == -1){
             ui->middleCardValue->hide();
             ui->middleCard->hide();
-            continue;
+            help = true;
         }
-        else if(r == -1){
+        if(r == -1){
             ui->rightCardValue->hide();
             ui->rightCard->hide();
-            continue;
+            help = true;
         }
+
+        if(help)
+            continue;
 
         if(i == 0)  //lewa karta
         {
@@ -563,7 +634,6 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                     break;
                 case '3':
                     ui->leftCardValue->setText("");
-                    ui->stackedWidget->setCurrentWidget(ui->chooseCardPage);
                     break;
                 case '4':
                     ui->leftCardValue->setText("+4");
@@ -643,7 +713,6 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                     break;
                 case '3':
                     ui->middleCardValue->setText("");
-                    ui->stackedWidget->setCurrentWidget(ui->chooseCardPage);
                     break;
                 case '4':
                     ui->middleCardValue->setText("+4");
@@ -722,7 +791,6 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                     break;
                 case '3':
                     ui->rightCardValue->setText("");
-                    ui->stackedWidget->setCurrentWidget(ui->chooseCardPage);
                     break;
                 case '4':
                     ui->rightCardValue->setText("+4");

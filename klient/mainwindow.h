@@ -58,6 +58,7 @@ private:
     char tableCard[4];
     int left, middle, right;
     bool start = true;
+    bool demand = false;
 
     char nick1[20], nick2[20], nick3[20], nick4[20];
     string nick;
