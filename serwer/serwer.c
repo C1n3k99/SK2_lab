@@ -49,7 +49,7 @@ struct thread_data_t
 };
 
 
-void bubblesort(int table[], int size)
+/*void bubblesort(int table[], int size)
 {
 	int i, j, temp;
 	for (i = 0; i<size-1; i++)
@@ -64,11 +64,10 @@ void bubblesort(int table[], int size)
 			}
 		}
         }
-}
-
-void tasowanie (char** talia)
+}*/
+void nowe_tasowanie (int rozmiar)
 {
-    int ilosc = sizeof(talia)/sizeof(talia[0]);
+    int ilosc = rozmiar;
     int T[ilosc];
     int T2[ilosc];
     srand(time(0));
@@ -77,7 +76,61 @@ void tasowanie (char** talia)
         T[i]=rand()%10000;
         T2[i]=T[i];
     }
-    bubblesort(T, ilosc);
+    //bubblesort(T, ilosc);
+    int temp1;
+    for (int i = 0; i<ilosc-1; i++)
+        {
+		for (int j=0; j<ilosc-1-i; j++)
+		{
+			if (T[j] > T[j+1])
+			{
+				temp1 = T[j+1];
+				T[j+1] = T[j];
+				T[j] = temp1;
+			}
+		}
+        }
+    char* temp2=malloc(3*sizeof(char));
+    for (int j=0;j<ilosc;j++)
+    {
+        for (int k=0; k<ilosc;k++)
+        {
+            if (T[j]==T2[k])
+            {
+                strcpy(temp2, nowa_talia[j]);
+                strcpy(nowa_talia[j], nowa_talia[k]);
+                strcpy(nowa_talia[k], temp2);
+                free(temp2);
+                break;
+            }
+        }
+    }
+}
+void tasowanie (int rozmiar)
+{
+    int ilosc = rozmiar;
+    int T[ilosc];
+    int T2[ilosc];
+    srand(time(0));
+    for (int i=0; i<ilosc; i++)
+    {
+        T[i]=rand()%10000;
+        T2[i]=T[i];
+    }
+    //bubblesort(T, ilosc);
+    int temp1;
+    for (int i = 0; i<ilosc-1; i++)
+        {
+		for (int j=0; j<ilosc-1-i; j++)
+		{
+			if (T[j] > T[j+1])
+			{
+				temp1 = T[j+1];
+				T[j+1] = T[j];
+				T[j] = temp1;
+			}
+		}
+        }
     char* temp=malloc(3*sizeof(char));
     for (int j=0;j<ilosc;j++)
     {
@@ -217,7 +270,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -279,7 +332,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -339,7 +392,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -407,7 +460,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -472,7 +525,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -534,7 +587,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -591,7 +644,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                         strcpy(nowa_talia[i], zagrane->rodzaj);
                         zagrane=pop(zagrane);
                     }
-                    tasowanie(nowa_talia);
+                    nowe_tasowanie(rozmiar_zagrane);
                     rozmiar_dobierane=0;
                     int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                     for (int i=0;i<rozmiar;i++)
@@ -651,7 +704,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -714,7 +767,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -775,7 +828,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -844,7 +897,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -910,7 +963,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -971,7 +1024,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                             strcpy(nowa_talia[i], zagrane->rodzaj);
                             zagrane=pop(zagrane);
                         }
-                        tasowanie(nowa_talia);
+                        nowe_tasowanie(rozmiar_zagrane);
                         rozmiar_dobierane=0;
                         int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                         for (int i=0;i<rozmiar;i++)
@@ -1027,7 +1080,7 @@ int sprawdzenie_komunikatu (char* komunikat)
                         strcpy(nowa_talia[i], zagrane->rodzaj);
                         zagrane=pop(zagrane);
                     }
-                    tasowanie(nowa_talia);
+                    nowe_tasowanie(rozmiar_zagrane);
                     rozmiar_dobierane=0;
                     int rozmiar = sizeof(nowa_talia)/sizeof(nowa_talia[0]);
                     for (int i=0;i<rozmiar;i++)
@@ -1115,8 +1168,9 @@ void *ThreadBehavior(void *t_data)
         zagrane=push(zagrane, talia[28]);
         rozmiar_zagrane+=1;
     }
-    
-    write(desc, talia[28], 3);
+    char proba[3];
+    strcpy(proba, talia[28]);
+    write(desc, proba, 3);
     for (int i=th_data->my_turn*7; i<(th_data->my_turn+1)*7;i++)
     {
         write(desc, talia[i], 3);
@@ -1208,7 +1262,7 @@ int main(int argc, char* argv[])
     
     int connection_socket_descriptor;
     przygotowanie_talii();
-    tasowanie(talia);
+    tasowanie(68);
     while(1)
     {
         connection_socket_descriptor = accept(server_socket_descriptor, NULL, NULL);
