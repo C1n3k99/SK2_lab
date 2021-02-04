@@ -100,11 +100,11 @@ void nowe_tasowanie (int rozmiar)
                 strcpy(temp2, nowa_talia[j]);
                 strcpy(nowa_talia[j], nowa_talia[k]);
                 strcpy(nowa_talia[k], temp2);
-                free(temp2);
                 break;
             }
         }
     }
+    free(temp2);
 }
 void tasowanie (int rozmiar)
 {
@@ -141,11 +141,11 @@ void tasowanie (int rozmiar)
                 strcpy(temp, talia[j]);
                 strcpy(talia[j], talia[k]);
                 strcpy(talia[k], temp);
-                free(temp);
                 break;
             }
         }
     }
+    free(temp);
 }
 
 void wysylanie_komunikatu(char* komunikat)
@@ -1133,6 +1133,7 @@ void *ThreadBehavior(void *t_data)
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
     int desc = th_data->my_socket;
     nick = malloc(4*sizeof(char*));
+    read(desc, nick[th_data->my_turn],20);
     if (th_data->my_turn<3)
     {
         pthread_mutex_lock(&start_mutex);
