@@ -30,8 +30,6 @@ private slots:
 
     void on_backButton_clicked();
 
-    void on_newGameButton_clicked();
-
     void on_blueButton_clicked();
 
     void on_yellowButton_clicked();

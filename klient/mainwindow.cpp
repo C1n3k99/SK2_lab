@@ -202,27 +202,31 @@ void MainWindow::read_data()
                 winnerIs += nick4;
 
             ui->winner->setText(QString::fromStdString(winnerIs));  //string na Qstring
+            ui->stackedWidget->setCurrentWidget(ui->winnerPage);
         }
         else{                           //dobieranie karty
             myDeck.push_back(msg);
-            if(int(myDeck.size() == 2))
+            if(myDeck.size() == 3)
             {
-                if(left == -1)
-                    left = 2;
-                else if(middle == -1)
-                    middle = 2;
-                else
-                    right = 2;
+                left = 2;
+                ui->leftCard->show();
+                ui->leftCardValue->show();
                 update_cards_in_hand(left, middle, right);
             }
-            else if(myDeck.size() == 1)
+            else if(myDeck.size() == 2)
             {
-                if(left == -1)
-                    left = 1;
-                else if(middle == -1)
-                    middle = 1;
-                else
-                    right = 1;
+                right = 1;
+                left = -1;
+                ui->rightCard->show();
+                ui->rightCardValue->show();
+                update_cards_in_hand(left, middle, right);
+            }
+            else if(left == int(myDeck.size()) -2){
+                left = myDeck.size() - 1;
+                update_cards_in_hand(left, middle, right);
+            }
+            else if(middle == int(myDeck.size()) -2){
+                right = myDeck.size() - 1;
                 update_cards_in_hand(left, middle, right);
             }
         }
@@ -258,11 +262,6 @@ void MainWindow::on_backButton_clicked()
     ui->stackedWidget->setCurrentWidget(ui->startingPage);
 }
 
-void MainWindow::on_newGameButton_clicked()
-{
-    ui->stackedWidget->setCurrentWidget(ui->startingPage);
-}
-
 void MainWindow::on_previousCard_clicked()
 {
     int l, m, r;
@@ -286,15 +285,20 @@ void MainWindow::on_previousCard_clicked()
     }
     else if(myDeck.size() == 2)
     {
-        left = -1;
+        l = -1;
         if(middle == 1){
-            middle = 0;
-            right = 1;
+            m = 0;
+            r = 1;
         }
         else{
-            middle = 1;
-            right = 0;
+            m = 1;
+            r = 0;
         }
+    }
+    else{
+        l = -1;
+        m = 0;
+        r = -1;
     }
 
     update_cards_in_hand(l, m, r);
@@ -326,15 +330,20 @@ void MainWindow::on_nextCard_clicked()
     }
     else if(myDeck.size() == 2)
     {
-        left = -1;
+        l = -1;
         if(middle == 1){
-            middle = 0;
-            right = 1;
+            m = 0;
+            r = 1;
         }
         else{
-            middle = 1;
-            right = 0;
+            m = 1;
+            r = 0;
         }
+    }
+    else{
+        l = -1;
+        m = 0;
+        r = -1;
     }
 
     update_cards_in_hand(l, m, r);
@@ -539,30 +548,23 @@ void MainWindow::update_table_card(char card[4])
 void MainWindow::update_cards_in_hand(int l, int m, int r)
 {
     char color, specialCard, value;
-    bool help;
+
+    if(l == -1){
+        ui->leftCardValue->hide();
+        ui->leftCard->hide();
+    }
+    if(m == -1){
+        ui->middleCardValue->hide();
+        ui->middleCard->hide();
+    }
+    if(r == -1){
+        ui->rightCardValue->hide();
+        ui->rightCard->hide();
+    }
+
     for(int i = 0; i < 3; i++)
     {
-        help = false;
-        if(l == -1){
-            ui->leftCardValue->hide();
-            ui->leftCard->hide();
-            help = true;
-        }
-        if(m == -1){
-            ui->middleCardValue->hide();
-            ui->middleCard->hide();
-            help = true;
-        }
-        if(r == -1){
-            ui->rightCardValue->hide();
-            ui->rightCard->hide();
-            help = true;
-        }
-
-        if(help)
-            continue;
-
-        if(i == 0)  //lewa karta
+        if(i==0 && l!=-1)  //lewa karta
         {
             color = myDeck[l][0];
             specialCard = myDeck[l][1];
@@ -641,7 +643,7 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                 }
             }
         }
-        else if(i == 1) //środkowa karta
+        else if(i==1 && m!=-1) //środkowa karta
         {
             color = myDeck[m][0];
             specialCard = myDeck[m][1];
@@ -720,7 +722,7 @@ void MainWindow::update_cards_in_hand(int l, int m, int r)
                 }
             }
         }
-        else{   //prawa karta
+        else if(r != -1){   //prawa karta
             color = myDeck[r][0];
             specialCard = myDeck[r][1];
             value = myDeck[r][2];
