@@ -1133,7 +1133,6 @@ void *ThreadBehavior(void *t_data)
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
     int desc = th_data->my_socket;
     nick = malloc(4*sizeof(char*));
-    read(desc, nick[th_data->my_turn],20);
     if (th_data->my_turn<3)
     {
         pthread_mutex_lock(&start_mutex);
@@ -1147,11 +1146,12 @@ void *ThreadBehavior(void *t_data)
         pthread_cond_broadcast(&start_cond);
     }
     pthread_mutex_lock(&talia_mutex);
+    read(desc, nick[th_data->my_turn],20);
     for (int i=0; i<4;i++)
     {
         nick[i]=malloc(20*sizeof(char));
     }
-    if (th_data->my_turn==0)
+    if (th_data->my_turn==3)
     {
         int indeks=28;
         while(talia[indeks][1]!='0')

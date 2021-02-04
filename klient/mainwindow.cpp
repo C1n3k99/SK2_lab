@@ -68,13 +68,12 @@ void MainWindow::read_data()
         middle = 1;
         right = 2;
         update_cards_in_hand(left, middle, right);
-
         char allNicks[83];
-        while(tcpSocket->bytesAvailable())
+        do
         {
             tcpSocket->readLine(allNicks, 83);
             nick += allNicks;
-        }
+        } while(tcpSocket->bytesAvailable());
 
         sscanf(nick.c_str(), "%[^;];%[^;];%[^;];%[^;]",  nick1, nick2, nick3, nick4);
 
@@ -116,11 +115,11 @@ void MainWindow::read_data()
         string message = "";
         int turn;
 
-        while(tcpSocket->bytesAvailable())
+        do
         {
             tcpSocket->readLine(msg, 20);
             message += msg;
-        }
+        } while(tcpSocket->bytesAvailable());
 
 
         if(message[0] >= '0' && message[0] <= '9')      //komunikaty cykliczne - odbieram: czyja kolej, karta-stół,  ilość kart każdego z graczy
