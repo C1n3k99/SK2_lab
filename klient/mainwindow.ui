@@ -30,8 +30,8 @@
        <widget class="QPushButton" name="connectButton">
         <property name="geometry">
          <rect>
-          <x>310</x>
-          <y>290</y>
+          <x>300</x>
+          <y>260</y>
           <width>261</width>
           <height>91</height>
          </rect>
@@ -46,49 +46,11 @@
          <string>Połącz</string>
         </property>
        </widget>
-       <widget class="QWidget" name="layoutWidget1">
-        <property name="geometry">
-         <rect>
-          <x>240</x>
-          <y>140</y>
-          <width>361</width>
-          <height>51</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
-         <item>
-          <widget class="QLabel" name="giveYourNick">
-           <property name="font">
-            <font>
-             <family>Calibri</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Podaj swój nick:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="yourNick">
-           <property name="font">
-            <font>
-             <family>Calibri</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
        <widget class="QWidget" name="layoutWidget2">
         <property name="geometry">
          <rect>
           <x>240</x>
-          <y>210</y>
+          <y>190</y>
           <width>361</width>
           <height>51</height>
          </rect>
