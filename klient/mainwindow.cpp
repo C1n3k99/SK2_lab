@@ -55,28 +55,77 @@ MainWindow::~MainWindow()
 void MainWindow::read_data()
 {
     if(start){              //pierwszy komunikat
-        char myCards[4];
+        char myId[3];
+        tcpSocket->readLine(myId, 3);
+        id = myId[0] - '0';
 
         tcpSocket->readLine(tableCard, 4);
+        update_table_card(tableCard);
+
+        /*
+        char msg[27];
+        string message = "";
+        char myCards[7][3];
+        do
+        {
+            tcpSocket->readLine(msg, 27);
+            message += msg;
+        } while(tcpSocket->bytesAvailable());
+
+        sscanf(message.c_str(), "%[^;];%[^;];%[^;];%[^;];%[^;];%[^;];%[^;]",  myCards[0],
+                myCards[1], myCards[2], myCards[3], myCards[4], myCards[5], myCards[6]);
+
+        for(int i = 0; i < 7; i ++){
+            myDeck.push_back(myCards[i]);
+        }*/
+
+        char myCards[4];
         for(int i = 0; i < 7; i++){
             tcpSocket->readLine(myCards, 4);
             myDeck.push_back(myCards);
         }
-        update_table_card(tableCard);
 
         left = 0;
         middle = 1;
         right = 2;
         update_cards_in_hand(left, middle, right);
-        char allNicks[83];
+        /*char allNicks[83];
         do
         {
             tcpSocket->readLine(allNicks, 83);
             nick += allNicks;
         } while(tcpSocket->bytesAvailable());
 
-        sscanf(nick.c_str(), "%[^;];%[^;];%[^;];%[^;]",  nick1, nick2, nick3, nick4);
+        sscanf(nick.c_str(), "%[^;];%[^;];%[^;];%[^;]",  nick1, nick2, nick3, nick4);*/
 
+
+
+        if(id == 0)
+        {
+            ui->player1->setText(QString::fromStdString(nick2));
+            ui->player2->setText(QString::fromStdString(nick3));
+            ui->player3->setText(QString::fromStdString(nick4));
+        }
+        else if(id == 1)
+        {
+            ui->player3->setText(QString::fromStdString(nick1));
+            ui->player1->setText(QString::fromStdString(nick3));
+            ui->player2->setText(QString::fromStdString(nick4));
+        }
+        else if(id == 2)
+        {
+            ui->player2->setText(QString::fromStdString(nick1));
+            ui->player3->setText(QString::fromStdString(nick2));
+            ui->player1->setText(QString::fromStdString(nick4));
+        }
+        else
+        {
+            ui->player1->setText(QString::fromStdString(nick1));
+            ui->player2->setText(QString::fromStdString(nick2));
+            ui->player3->setText(QString::fromStdString(nick3));
+        }
+
+        /*
         if(strcmp(nick1, ui->yourNick->text().toStdString().c_str()) == 0)
         {
             id = 0;
@@ -104,8 +153,8 @@ void MainWindow::read_data()
             ui->player1->setText(nick1);
             ui->player2->setText(nick2);
             ui->player3->setText(nick3);
-        }
-        ui->yourTurn->setText(nick1);
+        }*/
+        ui->yourTurn->setText(QString::fromStdString(nick1));
 
         ui->stackedWidget->setCurrentWidget(ui->gamePage);
         start = false;
@@ -150,13 +199,13 @@ void MainWindow::read_data()
 
 
             if(turn == 0)
-                ui->yourTurn->setText(nick1);
+                ui->yourTurn->setText(QString::fromStdString(nick1));
             else if(turn == 1)
-                ui->yourTurn->setText(nick2);
+                ui->yourTurn->setText(QString::fromStdString(nick2));
             else if(turn == 2)
-                ui->yourTurn->setText(nick3);
+                ui->yourTurn->setText(QString::fromStdString(nick3));
             else
-                ui->yourTurn->setText(nick4);
+                ui->yourTurn->setText(QString::fromStdString(nick4));
 
             if(id == 0)
             {
@@ -203,6 +252,31 @@ void MainWindow::read_data()
             ui->winner->setText(QString::fromStdString(winnerIs));  //string na Qstring
             ui->stackedWidget->setCurrentWidget(ui->winnerPage);
         }
+        else if(message[0] == '?'){
+            //char card[3];
+            //card[0] = myDeck[middle][0];
+            //card[1] = myDeck[middle][1];
+            //card[2] = myDeck[middle][2];
+
+            tcpSocket->write(confirm, 2);
+            throwCard();
+        }
+        else if(message[0] == 'n' && message[1] == 'n'){
+            ui->stackedWidget->setCurrentWidget(ui->gamePage);
+            ui->demandingColor->setText("Żądany kolor:\nNIEBIESKI");
+        }
+        else if(message[0] == 'y' && message[1] == 'y'){
+            ui->stackedWidget->setCurrentWidget(ui->gamePage);
+            ui->demandingColor->setText("Żądany kolor:\nŻÓŁTY");
+        }
+        else if(message[0] == 'z' && message[1] == 'z'){
+            ui->stackedWidget->setCurrentWidget(ui->gamePage);
+            ui->demandingColor->setText("Żądany kolor:\nZIELONY");
+        }
+        else if(message[0] == 'c' && message[1] == 'c'){
+            ui->stackedWidget->setCurrentWidget(ui->gamePage);
+            ui->demandingColor->setText("Żądany kolor:\nCZERWONY");
+        }
         else{                           //dobieranie karty
             myDeck.push_back(msg);
             if(myDeck.size() == 3)
@@ -244,6 +318,7 @@ void MainWindow::state_changed()
 {
     if (tcpSocket->state() == QTcpSocket::ConnectedState)
     {
+        //tcpSocket->write(ui->yourNick->text().toStdString().c_str(), 20);   //zamiana qstring na char
         ui->stackedWidget->setCurrentWidget(ui->waitingPage);
         ui->waitingLabel->setText("Oczekiwanie na graczy...");
     } 
@@ -252,7 +327,6 @@ void MainWindow::state_changed()
 void MainWindow::on_connectButton_clicked()
 {
     tcpSocket->connectToHost(ui->yourServerAddress->text(), 1234);
-    tcpSocket->write(ui->yourNick->text().toStdString().c_str(), 20);   //zamiana qstring na char
     ui->stackedWidget->setCurrentWidget(ui->waitingPage);
 }
 
@@ -351,17 +425,17 @@ void MainWindow::on_nextCard_clicked()
     right = r;
 }
 
-void MainWindow::on_throwCard_clicked()
+void MainWindow::throwCard()
 {
-    char card[4];
+    /*char card[4];
     card[0] = id + '0';
     card[1] = myDeck[middle][0];
     card[2] = myDeck[middle][1];
     card[3] = myDeck[middle][2];
 
-    tcpSocket->write(card, 4);
+    tcpSocket->write(card, 4);*/
 
-    if(card[1] == 'b')
+    if(myDeck[middle][0] == 'b')    //wcześniej card[1]
         demand = true;
     else
         demand = false;
@@ -401,6 +475,17 @@ void MainWindow::on_throwCard_clicked()
     update_cards_in_hand(left, middle, right);
 }
 
+void MainWindow::on_throwCard_clicked()
+{
+    char card[4];
+    card[0] = id + '0';
+    card[1] = myDeck[middle][0];
+    card[2] = myDeck[middle][1];
+    card[3] = myDeck[middle][2];
+
+    tcpSocket->write(card, 4);
+}
+
 void MainWindow::on_unoButton_clicked()
 {
     char uno[4];
@@ -425,8 +510,6 @@ void MainWindow::on_takeCard_clicked()
 
 void MainWindow::on_blueButton_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->gamePage);
-    ui->demandingColor->setText("Żądany kolor:\nNIEBIESKI");
     char color[2];
     color[0] = 'n';
     color[1] = 'n';
@@ -435,8 +518,6 @@ void MainWindow::on_blueButton_clicked()
 
 void MainWindow::on_yellowButton_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->gamePage);
-    ui->demandingColor->setText("Żądany kolor:\nŻÓŁTY");
     char color[2];
     color[0] = 'y';
     color[1] = 'y';
@@ -445,8 +526,6 @@ void MainWindow::on_yellowButton_clicked()
 
 void MainWindow::on_greenButton_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->gamePage);
-    ui->demandingColor->setText("Żądany kolor:\nZIELONY");
     char color[2];
     color[0] = 'z';
     color[1] = 'z';
@@ -455,8 +534,6 @@ void MainWindow::on_greenButton_clicked()
 
 void MainWindow::on_redButton_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->gamePage);
-    ui->demandingColor->setText("Żądany kolor:\nCZERWONY");
     char color[2];
     color[0] = 'c';
     color[1] = 'c';

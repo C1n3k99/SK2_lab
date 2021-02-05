@@ -40,6 +40,7 @@ char kolor[2];
 int sprawdzenie;
 int rozmiar_zagrane=0;
 int rozmiar_dobierane=0;
+char nic[2];
 
 
 struct thread_data_t
@@ -301,6 +302,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             zagrana = true;
         }
@@ -363,6 +366,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             zagrana = true;
         }
@@ -426,6 +431,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             zagrana = true;
         }
@@ -491,6 +498,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             zagrana = true;
         }
@@ -556,8 +565,11 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             read(tab_desc[kolej], kolor, 2);
+            wysylanie_komunikatu(kolor);
             zagrana = true;
             mode=true;
         }
@@ -618,8 +630,11 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             read(tab_desc[kolej], kolor, 2);
+            wysylanie_komunikatu(kolor);
             zagrana = true;
             mode=true;
         }
@@ -667,6 +682,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, wierzch, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             dobieranie=1;
             zagrana = true;
@@ -735,6 +752,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             mode=false;
             zagrana = true;
@@ -798,6 +817,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             zagrana = true;
             mode=false;
@@ -862,6 +883,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             zagrana = true;
             mode=false;
@@ -928,6 +951,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             zagrana = true;
             mode=false;
@@ -994,8 +1019,11 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             read(tab_desc[kolej], kolor, 2);
+            wysylanie_komunikatu(kolor);
             zagrana = true;
         }
         //zagranie zmiany koloru
@@ -1055,8 +1083,11 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, zagrana_karta, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             read(tab_desc[kolej], kolor, 2);
+            wysylanie_komunikatu(kolor);
             zagrana = true;
         }
         //komunikat o dobraniu kart
@@ -1104,6 +1135,8 @@ int sprawdzenie_komunikatu (char* komunikat)
             else czyja_kolej = kolej-1;
             if (czyja_kolej<0) czyja_kolej=czyja_kolej+4;
             sprintf(komunikat_wys, "%d;%s;%d;%d;%d;%d", czyja_kolej, wierzch, ile_na_rece[0], ile_na_rece[1], ile_na_rece[2], ile_na_rece[3]);
+            write(tab_desc[(int)(komunikat[0]-'0')],"??", 2);
+            read(tab_desc[(int)(komunikat[0]-'0')], nic, 2);
             wysylanie_komunikatu(komunikat_wys);
             dobieranie=1;
             zagrana = true;
@@ -1146,7 +1179,10 @@ void *ThreadBehavior(void *t_data)
         pthread_cond_broadcast(&start_cond);
     }
     pthread_mutex_lock(&talia_mutex);
-    read(desc, nick[th_data->my_turn],20);
+    char ktory[2];
+    ktory[0] = th_data->my_turn+'0';
+    ktory[1]='!';
+    write(desc, ktory,2);
     for (int i=0; i<4;i++)
     {
         nick[i]=malloc(20*sizeof(char));
@@ -1176,6 +1212,30 @@ void *ThreadBehavior(void *t_data)
     {
         write(desc, talia[i], 3);
     }
+    /*if (th_data->my_turn==0)
+    {
+        char wiadomosc1[27];
+        sprintf(wiadomosc1, "%s;%s;%s;%s;%s;%s;%s", talia[0], talia[1], talia[2], talia[3], talia[4], talia[5], talia[6]);
+        write(desc, wiadomosc1, 27);
+    }
+    if (th_data->my_turn==1)
+    {
+        char wiadomosc2[27];
+        sprintf(wiadomosc2, "%s;%s;%s;%s;%s;%s;%s", talia[7], talia[8], talia[9], talia[10], talia[11], talia[12], talia[13]);
+        write(desc, wiadomosc2, 27);
+    }
+    if (th_data->my_turn==2)
+    {
+        char wiadomosc3[27];
+        sprintf(wiadomosc3, "%s;%s;%s;%s;%s;%s;%s", talia[14], talia[15], talia[16], talia[17], talia[18], talia[19], talia[20]);
+        write(desc, wiadomosc3, 27);
+    }
+    if (th_data->my_turn==3)
+    {
+        char wiadomosc4[27];
+        sprintf(wiadomosc4, "%s;%s;%s;%s;%s;%s;%s", talia[21], talia[22], talia[23], talia[24], talia[25], talia[26], talia[27]);
+        write(desc, wiadomosc4, 27);
+    }*/
     if (th_data->my_turn==3)
     {   
         for (int i=29;i<68;i++)
@@ -1187,7 +1247,7 @@ void *ThreadBehavior(void *t_data)
     }
     char* global_nick=malloc(83*sizeof(char));
     sprintf(global_nick, "%s;%s;%s;%s", nick[0], nick[1], nick[2], nick[3]);
-    write(desc, global_nick, 83);
+    //write(desc, global_nick, 83);
     free(global_nick);
     pthread_mutex_unlock(&talia_mutex);
     char* komunikat=malloc(4*sizeof(char));

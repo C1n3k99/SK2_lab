@@ -23,6 +23,7 @@ public:
     void state_changed();
     void update_table_card(char card[3]);
     void update_cards_in_hand(int l, int m, int r);
+    void throwCard();
 
 private slots:
 
@@ -58,9 +59,15 @@ private:
     bool start = true;
     bool demand = false;
 
-    char nick1[20], nick2[20], nick3[20], nick4[20];
-    string nick;
+    //char nick1[20], nick2[20], nick3[20], nick4[20];
+    //string nick;
+    string nick1 = "gracz_1";
+    string nick2 = "gracz_2";
+    string nick3 = "gracz_3";
+    string nick4 = "gracz_4";
     int numberOfCards[4] = {7, 7, 7, 7};
     int id;
+    char confirm[2] = {'?', '?'};
+
 };
 #endif // MAINWINDOW_H
