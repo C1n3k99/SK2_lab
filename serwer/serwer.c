@@ -1272,7 +1272,8 @@ void *ThreadBehavior(void *t_data)
         }
         pthread_mutex_unlock(&ruch_mutex);
     }
-    
+
+    return NULL;
 }
 
 void handleConnection(int connection_socket_descriptor, int turn)

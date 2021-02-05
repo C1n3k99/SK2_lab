@@ -1,2 +1,2 @@
 all:
-	gcc -pthread serwer.c -g -o serwer.out
+	gcc -pthread serwer.c -g -o serwer.out -Wall
